@@ -97,7 +97,10 @@ export function CreateBusDialog() {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button size="lg" className="gap-2 bg-purple-600 hover:bg-purple-700">
+				<Button
+					size="lg"
+					className="gap-2 md:w-full bg-purple-600 hover:bg-purple-700"
+				>
 					<Plus className="h-5 w-5" />
 					Add New Bus
 				</Button>
@@ -122,7 +125,7 @@ export function CreateBusDialog() {
 									setFormData({ ...formData, origin: value })
 								}
 							>
-								<SelectTrigger id="origin">
+								<SelectTrigger className="w-full" id="origin">
 									<SelectValue placeholder="Select source location" />
 								</SelectTrigger>
 								<SelectContent>
@@ -143,7 +146,7 @@ export function CreateBusDialog() {
 									setFormData({ ...formData, destination: value })
 								}
 							>
-								<SelectTrigger id="destination">
+								<SelectTrigger className="w-full" id="destination">
 									<SelectValue placeholder="Select destination location" />
 								</SelectTrigger>
 								<SelectContent>
@@ -196,54 +199,55 @@ export function CreateBusDialog() {
 							</p>
 						</div>
 
-						{/* Type (Paid/Free) */}
-						<div className="grid gap-2">
-							<Label htmlFor="isPaid">Type</Label>
-							<Select
-								value={formData.isPaid ? "paid" : "free"}
-								onValueChange={(value) =>
-									setFormData({ ...formData, isPaid: value === "paid" })
-								}
-							>
-								<SelectTrigger id="isPaid">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="paid">Paid</SelectItem>
-									<SelectItem value="free">Free</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
+						<div className="flex gap-x-6">
+							{/* Type (Paid/Free) */}
+							<div className="gap-2 gap-x-6 md:flex-1 flex items-center">
+								<Label htmlFor="isPaid">Type</Label>
+								<Select
+									value={formData.isPaid ? "paid" : "free"}
+									onValueChange={(value) =>
+										setFormData({ ...formData, isPaid: value === "paid" })
+									}
+								>
+									<SelectTrigger id="isPaid">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="paid">Paid</SelectItem>
+										<SelectItem value="free">Free</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
 
-						{/* Status */}
-						<div className="grid gap-2">
-							<Label htmlFor="status">Status</Label>
-							<Select
-								value={formData.status}
-								onValueChange={(value) =>
-									setFormData({ ...formData, status: value })
-								}
-							>
-								<SelectTrigger id="status">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="On Time">On Time</SelectItem>
-									<SelectItem value="Delayed by 5 min">
-										Delayed by 5 min
-									</SelectItem>
-									<SelectItem value="Delayed by 10 min">
-										Delayed by 10 min
-									</SelectItem>
-									<SelectItem value="Delayed by 15 min">
-										Delayed by 15 min
-									</SelectItem>
-									<SelectItem value="Cancelled">Cancelled</SelectItem>
-								</SelectContent>
-							</Select>
+							{/* Status */}
+							<div className="gap-2 flex items-center">
+								<Label htmlFor="status">Status</Label>
+								<Select
+									value={formData.status}
+									onValueChange={(value) =>
+										setFormData({ ...formData, status: value })
+									}
+								>
+									<SelectTrigger id="status">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="On Time">On Time</SelectItem>
+										<SelectItem value="Delayed by 5 min">
+											Delayed by 5 min
+										</SelectItem>
+										<SelectItem value="Delayed by 10 min">
+											Delayed by 10 min
+										</SelectItem>
+										<SelectItem value="Delayed by 15 min">
+											Delayed by 15 min
+										</SelectItem>
+										<SelectItem value="Cancelled">Cancelled</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
 						</div>
 					</div>
-
 					<DialogFooter>
 						<Button
 							type="button"
