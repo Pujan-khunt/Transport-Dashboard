@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Bus } from "@/db/schema/bus";
 
@@ -51,30 +51,53 @@ export function BusCard({ bus, isCompleted }: BusCardProps) {
 
 	const statusStyle = getStatusStyle(bus.status);
 
+	// Display special destination if it exists
+	const displayDestination =
+		bus.destination === "Special" && bus.specialDestination
+			? bus.specialDestination
+			: bus.destination;
+
+	const displayOrigin =
+		bus.origin === "Special" && bus.specialDestination
+			? bus.specialDestination
+			: bus.origin;
+
 	return (
 		<Card
 			className={cn(
 				"relative overflow-hidden bg-[#1a1a1a] border-gray-800 transition-all hover:border-gray-700",
-				isCompleted && "opacity-40",
+				isCompleted && "opacity-55 border-gray-700/40",
 			)}
 		>
 			<div className="px-6 space-y-6">
+				{/* Completed Badge at Top Right */}
+				{isCompleted && (
+					<div className="absolute top-3 right-3">
+						<div className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-800/90 rounded-full border border-gray-700">
+							<CheckCircle className="h-3.5 w-3.5 text-gray-400" />
+							<span className="text-xs font-medium text-gray-400">
+								Completed
+							</span>
+						</div>
+					</div>
+				)}
+
 				{/* Header: Route and Type Badge */}
 				<div className="flex items-start justify-between gap-3">
-					<div className="flex items-center gap-3 flex-1 min-w-0">
-						<span className="text-white font-medium text-lg truncate">
-							{bus.origin}
+					<div className="flex items-center gap-3 min-w-0">
+						<span className="text-white font-medium text-xl truncate">
+							{displayOrigin}
 						</span>
 						<ArrowRight className="h-5 w-5 text-gray-500 shrink-0" />
-						<span className="text-white font-medium text-lg truncate">
-							{bus.destination}
+						<span className="text-white font-medium text-xl truncate">
+							{displayDestination}
 						</span>
 					</div>
 
 					<Badge
 						variant="secondary"
 						className={cn(
-							"text-xs font-semibold px-3 py-1 shrink-0",
+							"text-xs font-semibold px-3 py-1 shrink-0 absolute bottom-3 right-3",
 							bus.isPaid
 								? "bg-white text-black hover:bg-gray-100"
 								: "bg-white text-black hover:bg-gray-100",
@@ -86,7 +109,12 @@ export function BusCard({ bus, isCompleted }: BusCardProps) {
 
 				{/* Departure Time */}
 				<div>
-					<p className="text-4xl font-bold text-white tabular-nums">
+					<p
+						className={cn(
+							"text-5xl font-bold tabular-nums",
+							isCompleted ? "text-gray-500" : "text-white",
+						)}
+					>
 						{timeString}
 					</p>
 				</div>
@@ -103,14 +131,6 @@ export function BusCard({ bus, isCompleted }: BusCardProps) {
 					{bus.status}
 				</div>
 			</div>
-
-			{isCompleted && (
-				<div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
-					<div className="text-white text-lg font-semibold px-6 py-2 bg-gray-800/90 rounded-full border border-gray-700">
-						COMPLETED
-					</div>
-				</div>
-			)}
 		</Card>
 	);
 }

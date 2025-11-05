@@ -7,7 +7,7 @@ import { CurrentTimeDisplay } from "@/components/current-time-display";
 import { CheckCircle2 } from "lucide-react";
 import type { Bus } from "@/db/schema/bus";
 
-type Category = "uniworld-1" | "uniworld-2" | "special";
+type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
 interface PublicDashboardClientProps {
 	initialBuses: Bus[];
@@ -16,14 +16,16 @@ interface PublicDashboardClientProps {
 export function PublicDashboardClient({
 	initialBuses,
 }: PublicDashboardClientProps) {
-	const [selectedCategory, setSelectedCategory] =
-		useState<Category>("uniworld-1");
+	const [selectedLocation, setSelectedLocation] =
+		useState<Location>("Uniworld-1");
 
 	const filteredBuses = useMemo(() => {
 		return initialBuses.filter((bus) => {
-			return bus.category === selectedCategory;
+			return (
+				bus.origin === selectedLocation || bus.destination === selectedLocation
+			);
 		});
-	}, [initialBuses, selectedCategory]);
+	}, [initialBuses, selectedLocation]);
 
 	const { upcomingBuses, completedBuses, allCompleted } = useMemo(() => {
 		const now = new Date();
@@ -41,33 +43,44 @@ export function PublicDashboardClient({
 		return {
 			upcomingBuses: upcoming,
 			completedBuses: completed,
-			allCompleted: upcoming.length === 0 && completed.length > 0,
+			allCompleted: upcoming.length === 0 && filteredBuses.length > 0,
 		};
 	}, [filteredBuses]);
 
 	return (
 		<div className="min-h-screen bg-black">
 			<PublicNavbar
-				selectedCategory={selectedCategory}
-				onCategoryChange={setSelectedCategory}
+				selectedCategory={selectedLocation}
+				onCategoryChange={setSelectedLocation}
 			/>
 
 			<main className="px-6 py-6">
-				<div className="flex items-center justify-between mb-8">
-					<CurrentTimeDisplay />
-				</div>
-
 				{allCompleted && (
-					<div className="flex flex-col items-center justify-center py-24 space-y-4">
+					<div className="flex flex-col items-center justify-center py-16 space-y-6">
 						<div className="rounded-full bg-green-500/10 p-6">
 							<CheckCircle2 className="h-16 w-16 text-green-500" />
 						</div>
-						<h2 className="text-3xl font-bold text-white">
-							All Buses Completed!
-						</h2>
-						<p className="text-gray-400 text-lg">
-							All buses for today have departed. Check back tomorrow.
-						</p>
+						<div className="text-center space-y-2">
+							<h2 className="text-3xl font-bold text-white">
+								All Buses Completed for {selectedLocation}!
+							</h2>
+							<p className="text-gray-400 text-lg">
+								All scheduled buses have departed. Check back later.
+							</p>
+						</div>
+
+						{completedBuses.length > 0 && (
+							<div className="w-full mt-8">
+								<h3 className="text-lg font-semibold mb-4 text-gray-400 text-center">
+									Completed Buses ({completedBuses.length})
+								</h3>
+								<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+									{completedBuses.map((bus) => (
+										<BusCard key={bus.id} bus={bus} isCompleted />
+									))}
+								</div>
+							</div>
+						)}
 					</div>
 				)}
 
@@ -76,14 +89,22 @@ export function PublicDashboardClient({
 						<p className="text-xl font-semibold text-gray-400">
 							No buses scheduled
 						</p>
+						<p className="text-sm text-gray-500 mt-2">
+							No buses found for {selectedLocation}
+						</p>
 					</div>
 				)}
 
 				{upcomingBuses.length > 0 && (
-					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-						{upcomingBuses.map((bus) => (
-							<BusCard key={bus.id} bus={bus} />
-						))}
+					<div className="space-y-6">
+						<h3 className="text-lg font-semibold text-white">
+							Upcoming Buses ({upcomingBuses.length})
+						</h3>
+						<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+							{upcomingBuses.map((bus) => (
+								<BusCard key={bus.id} bus={bus} />
+							))}
+						</div>
 					</div>
 				)}
 

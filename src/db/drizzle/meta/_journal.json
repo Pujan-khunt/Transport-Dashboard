@@ -8,6 +8,13 @@
       "when": 1762178208858,
       "tag": "0000_bus_schema_added",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762340429784,
+      "tag": "0001_make_src_and_dest_enums",
+      "breakpoints": true
     }
   ]
 }

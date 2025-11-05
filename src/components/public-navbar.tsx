@@ -1,12 +1,13 @@
 "use client";
 
 import { CategoryNav } from "./category-nav";
+import { CurrentTimeDisplay } from "./current-time-display";
 
-type Category = "uniworld-1" | "uniworld-2" | "special";
+type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
 interface PublicNavbarProps {
-	selectedCategory: Category;
-	onCategoryChange: (category: Category) => void;
+	selectedCategory: Location;
+	onCategoryChange: (category: Location) => void;
 }
 
 export function PublicNavbar({
@@ -16,7 +17,6 @@ export function PublicNavbar({
 	return (
 		<nav className="w-full border-b border-gray-800 bg-black">
 			<div className="flex h-16 items-center justify-between px-6">
-				{/* Left: Logo + Title + Category Nav */}
 				<div className="flex items-center gap-8">
 					<div className="flex items-center gap-3">
 						<div className="h-8 w-8 bg-linear-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
@@ -27,6 +27,7 @@ export function PublicNavbar({
 
 					<CategoryNav value={selectedCategory} onChange={onCategoryChange} />
 				</div>
+				<CurrentTimeDisplay />
 			</div>
 		</nav>
 	);

@@ -23,24 +23,36 @@ import {
 import { Plus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
+
 export function CreateBusDialog() {
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [formData, setFormData] = useState({
-		origin: "",
-		destination: "",
-		category: "uniworld-1" as "uniworld-1" | "uniworld-2" | "special",
-		departureTime: "", // Time only (HH:MM)
+		origin: "" as Location | "",
+		destination: "" as Location | "",
+		specialDestination: "",
+		departureTime: "",
 		status: "On Time",
 		isPaid: true,
 	});
+
+	const showSpecialDestination =
+		formData.origin === "Special" || formData.destination === "Special";
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 
 		try {
+			// Validate special destination if Special is selected
+			if (showSpecialDestination && !formData.specialDestination.trim()) {
+				alert("Please enter the special destination location");
+				setIsLoading(false);
+				return;
+			}
+
 			// Combine today's date with the selected time
 			const today = new Date();
 			const [hours, minutes] = formData.departureTime.split(":");
@@ -50,8 +62,14 @@ export function CreateBusDialog() {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					...formData,
+					origin: formData.origin,
+					destination: formData.destination,
+					specialDestination: showSpecialDestination
+						? formData.specialDestination
+						: null,
 					departureTime: today.toISOString(),
+					status: formData.status,
+					isPaid: formData.isPaid,
 				}),
 			});
 
@@ -61,7 +79,7 @@ export function CreateBusDialog() {
 			setFormData({
 				origin: "",
 				destination: "",
-				category: "uniworld-1",
+				specialDestination: "",
 				departureTime: "",
 				status: "On Time",
 				isPaid: true,
@@ -95,51 +113,73 @@ export function CreateBusDialog() {
 					</DialogHeader>
 
 					<div className="grid gap-4 py-4">
+						{/* Origin Dropdown */}
 						<div className="grid gap-2">
 							<Label htmlFor="origin">Source</Label>
-							<Input
-								id="origin"
-								placeholder="e.g., Uniworld 1"
-								value={formData.origin}
-								onChange={(e) =>
-									setFormData({ ...formData, origin: e.target.value })
-								}
-								required
-							/>
-						</div>
-
-						<div className="grid gap-2">
-							<Label htmlFor="destination">Destination</Label>
-							<Input
-								id="destination"
-								placeholder="e.g., Macro"
-								value={formData.destination}
-								onChange={(e) =>
-									setFormData({ ...formData, destination: e.target.value })
-								}
-								required
-							/>
-						</div>
-
-						<div className="grid gap-2">
-							<Label htmlFor="category">Category</Label>
 							<Select
-								value={formData.category}
-								onValueChange={(value: any) =>
-									setFormData({ ...formData, category: value })
+								value={formData.origin}
+								onValueChange={(value: Location) =>
+									setFormData({ ...formData, origin: value })
 								}
 							>
-								<SelectTrigger id="category">
-									<SelectValue />
+								<SelectTrigger id="origin">
+									<SelectValue placeholder="Select source location" />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value="uniworld-1">Uniworld 1</SelectItem>
-									<SelectItem value="uniworld-2">Uniworld 2</SelectItem>
-									<SelectItem value="special">Special</SelectItem>
+									<SelectItem value="Uniworld-1">Uniworld 1</SelectItem>
+									<SelectItem value="Uniworld-2">Uniworld 2</SelectItem>
+									<SelectItem value="Macro">Macro</SelectItem>
+									<SelectItem value="Special">Special</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>
 
+						{/* Destination Dropdown */}
+						<div className="grid gap-2">
+							<Label htmlFor="destination">Destination</Label>
+							<Select
+								value={formData.destination}
+								onValueChange={(value: Location) =>
+									setFormData({ ...formData, destination: value })
+								}
+							>
+								<SelectTrigger id="destination">
+									<SelectValue placeholder="Select destination location" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="Uniworld-1">Uniworld 1</SelectItem>
+									<SelectItem value="Uniworld-2">Uniworld 2</SelectItem>
+									<SelectItem value="Macro">Macro</SelectItem>
+									<SelectItem value="Special">Special</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Special Destination Input (Conditional) */}
+						{showSpecialDestination && (
+							<div className="grid gap-2">
+								<Label htmlFor="specialDestination">
+									Special Destination Location
+								</Label>
+								<Input
+									id="specialDestination"
+									placeholder="e.g., Airport, Mall, etc."
+									value={formData.specialDestination}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											specialDestination: e.target.value,
+										})
+									}
+									required={showSpecialDestination}
+								/>
+								<p className="text-xs text-muted-foreground">
+									Enter the specific location for the special route
+								</p>
+							</div>
+						)}
+
+						{/* Departure Time */}
 						<div className="grid gap-2">
 							<Label htmlFor="departureTime">Departure Time (Today)</Label>
 							<Input
@@ -156,6 +196,7 @@ export function CreateBusDialog() {
 							</p>
 						</div>
 
+						{/* Type (Paid/Free) */}
 						<div className="grid gap-2">
 							<Label htmlFor="isPaid">Type</Label>
 							<Select
@@ -174,6 +215,7 @@ export function CreateBusDialog() {
 							</Select>
 						</div>
 
+						{/* Status */}
 						<div className="grid gap-2">
 							<Label htmlFor="status">Status</Label>
 							<Select

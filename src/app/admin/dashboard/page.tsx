@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth/next-auth";
 import { AdminDashboardClient } from "./admin-dashboard-client";
 import { db } from "@/db/index";
-import { bus } from "@/db/schema/bus";
+import { Bus, bus } from "@/db/schema/bus";
 import { asc } from "drizzle-orm";
 
 export default async function AdminDashboardPage() {
@@ -14,7 +14,10 @@ export default async function AdminDashboardPage() {
 	}
 
 	// Fetch all buses from database
-	const buses = await db.select().from(bus).orderBy(asc(bus.departureTime));
+	const buses: Bus[] = await db
+		.select()
+		.from(bus)
+		.orderBy(asc(bus.departureTime));
 	console.log(buses);
 
 	return (

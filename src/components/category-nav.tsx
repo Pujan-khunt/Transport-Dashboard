@@ -2,35 +2,36 @@
 
 import { cn } from "@/lib/utils";
 
-type Category = "uniworld-1" | "uniworld-2" | "special";
+type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
 interface CategoryNavProps {
-	value: Category;
-	onChange: (value: Category) => void;
+	value: Location;
+	onChange: (value: Location) => void;
 	className?: string;
 }
 
 export function CategoryNav({ value, onChange, className }: CategoryNavProps) {
-	const categories: { value: Category; label: string }[] = [
-		{ value: "uniworld-1", label: "Uniworld 1" },
-		{ value: "uniworld-2", label: "Uniworld 2" },
-		{ value: "special", label: "Special" },
+	const locations: { value: Location; label: string }[] = [
+		{ value: "Uniworld-1", label: "Uniworld 1" },
+		{ value: "Uniworld-2", label: "Uniworld 2" },
+		{ value: "Macro", label: "Macro" },
+		{ value: "Special", label: "Special" },
 	];
 
 	return (
 		<nav className={cn("flex items-center gap-2", className)}>
-			{categories.map((category) => (
+			{locations.map((location) => (
 				<button
-					key={category.value}
-					onClick={() => onChange(category.value)}
+					key={location.value}
+					onClick={() => onChange(location.value)}
 					className={cn(
-						"px-6 py-2 rounded-md text-sm font-medium transition-all",
-						value === category.value
+						"px-6 py-2 rounded-md font-medium transition-all",
+						value === location.value
 							? "bg-white text-black shadow-sm"
 							: "text-gray-400 hover:text-gray-200",
 					)}
 				>
-					{category.label}
+					{location.label}
 				</button>
 			))}
 		</nav>

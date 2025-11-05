@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock } from "lucide-react";
 
 export function CurrentTimeDisplay() {
 	const [mounted, setMounted] = useState(false);
@@ -45,12 +44,9 @@ export function CurrentTimeDisplay() {
 	});
 
 	return (
-		<div className="flex items-center gap-2 text-right">
-			<div>
-				<Clock />
-				<p className="text-2xl font-bold tabular-nums">{timeString}</p>
-				<p className="text-xs text-gray-400">{dateString}</p>
-			</div>
+		<div className="text-white flex items-center gap-x-6">
+			<p className="text-2xl">{dateString}</p>
+			<p className="text-2xl font-bold tabular-nums">{timeString}</p>
 		</div>
 	);
 }

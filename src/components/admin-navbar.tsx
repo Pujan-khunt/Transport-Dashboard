@@ -5,9 +5,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut } from "lucide-react";
 import { CategoryNav } from "./category-nav";
 import Link from "next/link";
-import Image from "next/image";
+import { CurrentTimeDisplay } from "./current-time-display";
 
-type Category = "uniworld-1" | "uniworld-2" | "special";
+type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
 interface AdminNavbarProps {
 	user: {
@@ -15,8 +15,8 @@ interface AdminNavbarProps {
 		email?: string | null;
 		image?: string | null;
 	};
-	selectedCategory: Category;
-	onCategoryChange: (category: Category) => void;
+	selectedCategory: Location;
+	onCategoryChange: (category: Location) => void;
 }
 
 export function AdminNavbar({
@@ -45,6 +45,8 @@ export function AdminNavbar({
 
 					<CategoryNav value={selectedCategory} onChange={onCategoryChange} />
 				</div>
+
+				<CurrentTimeDisplay />
 
 				{/* Right: User Info + Sign Out */}
 				<div className="flex items-center gap-4">
