@@ -22,24 +22,39 @@ import {
 } from "@/components/ui/select";
 import { Plus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
+
+const PRESET_STATUSES = [
+	{ value: "On Time", label: "On Time" },
+	{ value: "Delayed by 5 min", label: "Delayed by 5 min" },
+	{ value: "Delayed by 10 min", label: "Delayed by 10 min" },
+	{ value: "Delayed by 15 min", label: "Delayed by 15 min" },
+	{ value: "Delayed by 20 min", label: "Delayed by 20 min" },
+	{ value: "Cancelled", label: "Cancelled" },
+	{ value: "custom", label: "Custom Status..." },
+];
 
 export function CreateBusDialog() {
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [selectedStatus, setSelectedStatus] = useState<string>("On Time");
+	const [customStatus, setCustomStatus] = useState("");
 	const [formData, setFormData] = useState({
 		origin: "" as Location | "",
 		destination: "" as Location | "",
 		specialDestination: "",
 		departureTime: "",
-		status: "On Time",
 		isPaid: true,
 	});
 
 	const showSpecialDestination =
 		formData.origin === "Special" || formData.destination === "Special";
+
+	const isCustomStatus = selectedStatus === "custom";
+	const finalStatus = isCustomStatus ? customStatus : selectedStatus;
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -49,6 +64,13 @@ export function CreateBusDialog() {
 			// Validate special destination if Special is selected
 			if (showSpecialDestination && !formData.specialDestination.trim()) {
 				alert("Please enter the special destination location");
+				setIsLoading(false);
+				return;
+			}
+
+			// Validate custom status
+			if (isCustomStatus && !customStatus.trim()) {
+				alert("Please enter a custom status");
 				setIsLoading(false);
 				return;
 			}
@@ -68,7 +90,7 @@ export function CreateBusDialog() {
 						? formData.specialDestination
 						: null,
 					departureTime: today.toISOString(),
-					status: formData.status,
+					status: finalStatus,
 					isPaid: formData.isPaid,
 				}),
 			});
@@ -81,9 +103,10 @@ export function CreateBusDialog() {
 				destination: "",
 				specialDestination: "",
 				departureTime: "",
-				status: "On Time",
 				isPaid: true,
 			});
+			setSelectedStatus("On Time");
+			setCustomStatus("");
 			setOpen(false);
 			router.refresh();
 		} catch (error) {
@@ -94,18 +117,23 @@ export function CreateBusDialog() {
 		}
 	};
 
+	const handleStatusChange = (value: string) => {
+		setSelectedStatus(value);
+		// Clear custom status when switching away from custom
+		if (value !== "custom") {
+			setCustomStatus("");
+		}
+	};
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button
-					size="lg"
-					className="gap-2 md:w-full bg-purple-600 hover:bg-purple-700"
-				>
+				<Button size="lg" className="gap-2 bg-purple-600 hover:bg-purple-700">
 					<Plus className="h-5 w-5" />
 					Add New Bus
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[500px]">
+			<DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
 				<form onSubmit={handleSubmit}>
 					<DialogHeader>
 						<DialogTitle>Add New Bus Schedule</DialogTitle>
@@ -125,7 +153,7 @@ export function CreateBusDialog() {
 									setFormData({ ...formData, origin: value })
 								}
 							>
-								<SelectTrigger className="w-full" id="origin">
+								<SelectTrigger id="origin">
 									<SelectValue placeholder="Select source location" />
 								</SelectTrigger>
 								<SelectContent>
@@ -146,7 +174,7 @@ export function CreateBusDialog() {
 									setFormData({ ...formData, destination: value })
 								}
 							>
-								<SelectTrigger className="w-full" id="destination">
+								<SelectTrigger id="destination">
 									<SelectValue placeholder="Select destination location" />
 								</SelectTrigger>
 								<SelectContent>
@@ -199,72 +227,106 @@ export function CreateBusDialog() {
 							</p>
 						</div>
 
-						<div className="flex gap-x-6">
-							{/* Type (Paid/Free) */}
-							<div className="gap-2 gap-x-6 md:flex-1 flex items-center">
-								<Label htmlFor="isPaid">Type</Label>
-								<Select
-									value={formData.isPaid ? "paid" : "free"}
-									onValueChange={(value) =>
-										setFormData({ ...formData, isPaid: value === "paid" })
-									}
-								>
-									<SelectTrigger id="isPaid">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="paid">Paid</SelectItem>
-										<SelectItem value="free">Free</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-
-							{/* Status */}
-							<div className="gap-2 flex items-center">
-								<Label htmlFor="status">Status</Label>
-								<Select
-									value={formData.status}
-									onValueChange={(value) =>
-										setFormData({ ...formData, status: value })
-									}
-								>
-									<SelectTrigger id="status">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="On Time">On Time</SelectItem>
-										<SelectItem value="Delayed by 5 min">
-											Delayed by 5 min
-										</SelectItem>
-										<SelectItem value="Delayed by 10 min">
-											Delayed by 10 min
-										</SelectItem>
-										<SelectItem value="Delayed by 15 min">
-											Delayed by 15 min
-										</SelectItem>
-										<SelectItem value="Cancelled">Cancelled</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
+						{/* Type (Paid/Free) */}
+						<div className="grid gap-2">
+							<Label htmlFor="isPaid">Type</Label>
+							<Select
+								value={formData.isPaid ? "paid" : "free"}
+								onValueChange={(value) =>
+									setFormData({ ...formData, isPaid: value === "paid" })
+								}
+							>
+								<SelectTrigger id="isPaid">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="paid">Paid</SelectItem>
+									<SelectItem value="free">Free</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
+
+						{/* Status Dropdown with Custom Option */}
+						<div className="grid gap-2">
+							<Label htmlFor="status">Status</Label>
+							<Select value={selectedStatus} onValueChange={handleStatusChange}>
+								<SelectTrigger
+									id="status"
+									className={cn(isCustomStatus && "border-purple-500")}
+								>
+									<SelectValue placeholder="Select status" />
+								</SelectTrigger>
+								<SelectContent>
+									{PRESET_STATUSES.map((status) => (
+										<SelectItem key={status.value} value={status.value}>
+											{status.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Custom Status Input (Conditional) */}
+						{isCustomStatus && (
+							<div className="grid gap-2 animate-in slide-in-from-top-2 duration-200">
+								<Label htmlFor="customStatus">
+									Custom Status{" "}
+									<span className="text-purple-500 text-xs">(Required)</span>
+								</Label>
+								<Input
+									id="customStatus"
+									placeholder="e.g., Waiting for driver, Boarding, etc."
+									value={customStatus}
+									onChange={(e) => setCustomStatus(e.target.value)}
+									className="border-purple-500 focus-visible:ring-purple-500"
+									autoFocus
+									required={isCustomStatus}
+								/>
+								<p className="text-xs text-muted-foreground">
+									Enter any custom status message you want to display
+								</p>
+								{customStatus && (
+									<div className="mt-1 p-3 bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-md">
+										<p className="text-xs text-muted-foreground mb-1">
+											Preview:
+										</p>
+										<div className="inline-flex items-center px-3 py-1.5 rounded-full border text-sm font-medium bg-blue-500/10 text-blue-500 border-blue-500/20">
+											{customStatus}
+										</div>
+									</div>
+								)}
+							</div>
+						)}
 					</div>
-					<DialogFooter>
+
+					<DialogFooter className="gap-2">
 						<Button
 							type="button"
 							variant="outline"
-							onClick={() => setOpen(false)}
+							onClick={() => {
+								setOpen(false);
+								setSelectedStatus("On Time");
+								setCustomStatus("");
+							}}
 							disabled={isLoading}
 						>
 							Cancel
 						</Button>
-						<Button type="submit" disabled={isLoading}>
+						<Button
+							type="submit"
+							disabled={isLoading || (isCustomStatus && !customStatus.trim())}
+							className="bg-purple-600 hover:bg-purple-700"
+						>
 							{isLoading ? (
 								<>
 									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 									Creating...
 								</>
 							) : (
-								"Create Bus"
+								<>
+									<Plus className="mr-2 h-4 w-4" />
+									Create Bus
+								</>
 							)}
 						</Button>
 					</DialogFooter>
