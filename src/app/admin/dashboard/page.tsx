@@ -1,16 +1,16 @@
+import { asc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth/next-auth";
-import { AdminDashboardClient } from "./admin-dashboard-client";
 import { db } from "@/db/index";
-import { Bus, bus } from "@/db/schema/bus";
-import { asc } from "drizzle-orm";
+import { type Bus, bus } from "@/db/schema/bus";
+import { AdminDashboardClient } from "./admin-dashboard-client";
 
 export default async function AdminDashboardPage() {
 	const session = await auth();
 
 	// Protect route
 	if (!session?.user.isAdmin) {
-		redirect("/auth/sign-in");
+		redirect("/auth/signin");
 	}
 
 	// Fetch all buses from database
