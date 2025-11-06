@@ -1,9 +1,12 @@
+import { Suspense } from "react";
 import { PublicNavbar } from "@/components/public-navbar";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<>
-			<PublicNavbar />
+			<Suspense>
+				<PublicNavbar />
+			</Suspense>
 			{children}
 		</>
 	);
