@@ -1,14 +1,17 @@
 "use client";
 
+import { ArrowRight, CheckCircle, Pencil } from "lucide-react"; // Import Pencil
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button"; // Import Button
 import { Card } from "@/components/ui/card";
-import { ArrowRight, CheckCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { Bus } from "@/db/schema/bus";
+import { cn } from "@/lib/utils";
+import { EditBusDialog } from "./edit-bus-dialog"; // Import the new dialog
 
 interface BusCardProps {
 	bus: Bus;
 	isCompleted?: boolean;
+	isAdminView?: boolean; // Add prop to show admin controls
 }
 
 const getStatusStyle = (status: string) => {
@@ -41,7 +44,7 @@ const getStatusStyle = (status: string) => {
 	};
 };
 
-export function BusCard({ bus, isCompleted }: BusCardProps) {
+export function BusCard({ bus, isCompleted, isAdminView }: BusCardProps) {
 	const departureTime = new Date(bus.departureTime);
 	const timeString = departureTime.toLocaleTimeString("en-US", {
 		hour: "2-digit",
@@ -65,12 +68,31 @@ export function BusCard({ bus, isCompleted }: BusCardProps) {
 	return (
 		<Card
 			className={cn(
-				"relative overflow-hidden bg-[#1a1a1a] border-gray-800 transition-all hover:border-gray-700",
+				"relative group overflow-hidden bg-[#1a1a1a] border-gray-800 transition-all hover:border-gray-700",
 				isCompleted && "opacity-55 border-gray-700/40",
 			)}
 		>
+			{/* Admin Edit Button: Shows on hover for upcoming buses in admin view */}
+			{isAdminView && !isCompleted && (
+				<EditBusDialog bus={bus}>
+					<Button
+						variant="outline"
+						size="sm"
+						className={cn(
+							"absolute top-3 right-3 z-10",
+							"bg-gray-900/50 border-gray-700/60 text-gray-300",
+							"opacity-0 group-hover:opacity-100 transition-opacity", // Show on hover
+							"hover:bg-gray-800 hover:text-white hover:border-gray-600",
+						)}
+					>
+						<Pencil className="h-4 w-4 mr-2" />
+						Edit
+					</Button>
+				</EditBusDialog>
+			)}
+
 			<div className="px-6 space-y-6">
-				{/* Completed Badge at Top Right */}
+				{/* Completed Badge: Show if completed. If in admin view, hide if edit button is present (i.e., not completed) */}
 				{isCompleted && (
 					<div className="absolute top-3 right-3">
 						<div className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-800/90 rounded-full border border-gray-700">
@@ -83,7 +105,7 @@ export function BusCard({ bus, isCompleted }: BusCardProps) {
 				)}
 
 				{/* Header: Route and Type Badge */}
-				<div className="flex items-start justify-between gap-3">
+				<div className="flex items-start justify-between gap-3 pt-2">
 					<div className="flex items-center gap-3 min-w-0">
 						<span className="text-white font-medium text-xl truncate">
 							{displayOrigin}

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { AdminNavbar } from "@/components/admin-navbar";
-import { BusCard } from "@/components/bus-card";
-import { CreateBusDialog } from "@/components/create-bus-dialog";
 import { CheckCircle2 } from "lucide-react";
+import { useMemo, useState } from "react";
 import type { Bus } from "@/db/schema/bus";
+import { AdminNavbar } from "../../../components/admin-navbar";
+import { BusCard } from "../../../components/bus-card";
+import { CreateBusDialog } from "../../../components/create-bus-dialog";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
@@ -93,7 +93,12 @@ export function AdminDashboardClient({
 								</h3>
 								<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 									{completedBuses.map((bus) => (
-										<BusCard key={bus.id} bus={bus} isCompleted />
+										<BusCard
+											key={bus.id}
+											bus={bus}
+											isCompleted
+											isAdminView // Pass admin view prop
+										/>
 									))}
 								</div>
 							</div>
@@ -122,7 +127,11 @@ export function AdminDashboardClient({
 						</h3>
 						<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 							{upcomingBuses.map((bus) => (
-								<BusCard key={bus.id} bus={bus} />
+								<BusCard
+									key={bus.id}
+									bus={bus}
+									isAdminView // Pass admin view prop
+								/>
 							))}
 						</div>
 					</div>
@@ -136,7 +145,12 @@ export function AdminDashboardClient({
 						</h3>
 						<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 							{completedBuses.map((bus) => (
-								<BusCard key={bus.id} bus={bus} isCompleted />
+								<BusCard
+									key={bus.id}
+									bus={bus}
+									isCompleted
+									isAdminView // Pass admin view prop
+								/>
 							))}
 						</div>
 					</div>

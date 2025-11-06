@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { PublicNavbar } from "@/components/public-navbar";
-import { BusCard } from "@/components/bus-card";
-import { CurrentTimeDisplay } from "@/components/current-time-display";
 import { CheckCircle2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { BusCard } from "@/components/bus-card";
+import { PublicNavbar } from "@/components/public-navbar";
 import type { Bus } from "@/db/schema/bus";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";

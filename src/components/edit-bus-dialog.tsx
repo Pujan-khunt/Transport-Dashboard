@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Plus } from "lucide-react";
+import { AlertTriangle, Loader2, Save, Trash } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +21,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-// import { useRouter } from "next/navigation"; // Removed to prevent potential build errors
+import type { Bus } from "@/db/schema/bus";
+// import { useRouter } from "next/navigation"; // This import is removed as it's causing a resolution error
 import { cn } from "@/lib/utils";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
@@ -36,18 +37,51 @@ const PRESET_STATUSES = [
 	{ value: "custom", label: "Custom Status..." },
 ];
 
-export function CreateBusDialog() {
-	// const router = useRouter(); // Removed
+/**
+ * Formats an ISO date string or Date object into HH:mm format.
+ * @param isoDate The date to format.
+ * @returns A string in "HH:mm" format.
+ */
+const formatTime = (isoDate: string | Date) => {
+	const date = new Date(isoDate);
+	const hours = date.getHours().toString().padStart(2, "0");
+	const minutes = date.getMinutes().toString().padStart(2, "0");
+	return `${hours}:${minutes}`;
+};
+
+/**
+ * Checks if a given status string is one of the predefined preset values.
+ * @param status The status string to check.
+ * @returns True if the status is a preset, false otherwise.
+ */
+const isPresetStatus = (status: string) => {
+	return PRESET_STATUSES.some((s) => s.value === status);
+};
+
+interface EditBusDialogProps {
+	bus: Bus;
+	children: React.ReactNode; // The trigger button (e.g., the <Button> in BusCard)
+}
+
+export function EditBusDialog({ bus, children }: EditBusDialogProps) {
+	// const router = useRouter(); // This hook is removed
 	const [open, setOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
-	const [selectedStatus, setSelectedStatus] = useState<string>("On Time");
-	const [customStatus, setCustomStatus] = useState("");
+	const [isDeleting, setIsDeleting] = useState(false);
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+	// Determine initial status state based on whether the current status is a preset or custom
+	const initialStatus = isPresetStatus(bus.status) ? bus.status : "custom";
+	const initialCustomStatus = isPresetStatus(bus.status) ? "" : bus.status;
+
+	const [selectedStatus, setSelectedStatus] = useState<string>(initialStatus);
+	const [customStatus, setCustomStatus] = useState(initialCustomStatus);
 	const [formData, setFormData] = useState({
-		origin: "" as Location | "",
-		destination: "" as Location | "",
-		specialDestination: "",
-		departureTime: "",
-		isPaid: true,
+		origin: bus.origin as Location,
+		destination: bus.destination as Location,
+		specialDestination: bus.specialDestination || "",
+		departureTime: formatTime(bus.departureTime),
+		isPaid: bus.isPaid,
 	});
 
 	const showSpecialDestination =
@@ -56,106 +90,129 @@ export function CreateBusDialog() {
 	const isCustomStatus = selectedStatus === "custom";
 	const finalStatus = isCustomStatus ? customStatus : selectedStatus;
 
-	const resetForm = () => {
-		setFormData({
-			origin: "",
-			destination: "",
-			specialDestination: "",
-			departureTime: "",
-			isPaid: true,
-		});
-		setSelectedStatus("On Time");
-		setCustomStatus("");
-		setIsLoading(false);
-	};
-
+	/**
+	 * Handles the form submission to update the bus details.
+	 * Makes a PUT request to the /api/buses endpoint.
+	 */
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 
 		try {
-			// Validate special destination if Special is selected
+			// Validate form fields
 			if (showSpecialDestination && !formData.specialDestination.trim()) {
 				alert("Please enter the special destination location");
 				setIsLoading(false);
 				return;
 			}
-
-			// Validate custom status
 			if (isCustomStatus && !customStatus.trim()) {
 				alert("Please enter a custom status");
 				setIsLoading(false);
 				return;
 			}
 
-			// Combine today's date with the selected time
-			const today = new Date();
+			// Combine the original date with the new time
+			const departureDate = new Date(bus.departureTime); // Use original date to keep the day correct
 			const [hours, minutes] = formData.departureTime.split(":");
-			today.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+			departureDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
 			const response = await fetch("/api/buses", {
-				method: "POST",
+				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
+					busId: bus.id, // Include the busId for the PUT request
 					origin: formData.origin,
 					destination: formData.destination,
 					specialDestination: showSpecialDestination
 						? formData.specialDestination
 						: null,
-					departureTime: today.toISOString(),
+					departureTime: departureDate.toISOString(),
 					status: finalStatus,
 					isPaid: formData.isPaid,
 				}),
 			});
 
-			if (!response.ok) throw new Error("Failed to create bus");
+			if (!response.ok) throw new Error("Failed to update bus");
 
-			// Reset form and close dialog
-			resetForm();
 			setOpen(false);
-			// router.refresh();
-			window.location.reload(); // Use full page reload
+			// router.refresh(); // Refresh server components to show updated data
+			window.location.reload(); // Use full page reload as router isn't available in this context
 		} catch (error) {
-			console.error("Error creating bus:", error);
-			alert("Failed to create bus. Please try again.");
+			console.error("Error updating bus:", error);
+			alert("Failed to update bus. Please try again.");
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
+	/**
+	 * Handles deleting the bus.
+	 * Makes a DELETE request to the /api/buses endpoint.
+	 */
+	const handleDelete = async () => {
+		setIsDeleting(true);
+		try {
+			const response = await fetch("/api/buses", {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ busId: bus.id }),
+			});
+
+			if (!response.ok) throw new Error("Failed to delete bus");
+
+			setOpen(false);
+			// router.refresh(); // Refresh server components
+			window.location.reload(); // Use full page reload as router isn't available in this context
+		} catch (error) {
+			console.error("Error deleting bus:", error);
+			alert("Failed to delete bus. Please try again.");
+		} finally {
+			setIsDeleting(false);
+			setShowDeleteConfirm(false);
+		}
+	};
+
+	/**
+	 * Updates the status state and clears custom status if a preset is selected.
+	 */
 	const handleStatusChange = (value: string) => {
 		setSelectedStatus(value);
-		// Clear custom status when switching away from custom
 		if (value !== "custom") {
 			setCustomStatus("");
 		}
 	};
 
+	/**
+	 * Resets the form state to the original bus data when the dialog is opened.
+	 */
+	const onOpenChange = (isOpen: boolean) => {
+		setOpen(isOpen);
+		if (isOpen) {
+			// Reset state to bus props every time it opens
+			setFormData({
+				origin: bus.origin as Location,
+				destination: bus.destination as Location,
+				specialDestination: bus.specialDestination || "",
+				departureTime: formatTime(bus.departureTime),
+				isPaid: bus.isPaid,
+			});
+			setSelectedStatus(initialStatus);
+			setCustomStatus(initialCustomStatus);
+			setShowDeleteConfirm(false);
+			setIsLoading(false);
+			setIsDeleting(false);
+		}
+	};
+
 	return (
-		<Dialog
-			open={open}
-			onOpenChange={(isOpen) => {
-				setOpen(isOpen);
-				if (!isOpen) {
-					resetForm(); // Reset form when dialog is closed
-				}
-			}}
-		>
-			<DialogTrigger asChild>
-				<Button size="lg" className="gap-2 bg-purple-600 hover:bg-purple-700">
-					<Plus className="h-5 w-5" />
-					Add New Bus
-				</Button>
-			</DialogTrigger>
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-gray-950 border-gray-800 text-white">
 				<form onSubmit={handleSubmit}>
 					<DialogHeader>
-						<DialogTitle className="text-white">
-							Add New Bus Schedule
-						</DialogTitle>
+						<DialogTitle className="text-white">Edit Bus Schedule</DialogTitle>
 						<DialogDescription className="text-gray-400">
-							Create a new bus entry for today. All buses are scheduled for the
-							current date.
+							Update the details for this bus.
 						</DialogDescription>
 					</DialogHeader>
 
@@ -240,7 +297,7 @@ export function CreateBusDialog() {
 						{/* Departure Time */}
 						<div className="grid gap-2">
 							<Label htmlFor="departureTime" className="text-gray-300">
-								Departure Time (Today)
+								Departure Time
 							</Label>
 							<Input
 								id="departureTime"
@@ -252,9 +309,6 @@ export function CreateBusDialog() {
 								required
 								className="bg-gray-900 border-gray-700 text-white"
 							/>
-							<p className="text-xs text-gray-500">
-								Bus will be scheduled for today at the selected time
-							</p>
 						</div>
 
 						{/* Type (Paid/Free) */}
@@ -326,33 +380,79 @@ export function CreateBusDialog() {
 						)}
 					</div>
 
-					<DialogFooter className="gap-2">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => setOpen(false)}
-							disabled={isLoading}
-							className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
-						>
-							Cancel
-						</Button>
-						<Button
-							type="submit"
-							disabled={isLoading || (isCustomStatus && !customStatus.trim())}
-							className="bg-purple-600 hover:bg-purple-700 text-white"
-						>
-							{isLoading ? (
-								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									Creating...
-								</>
-							) : (
-								<>
-									<Plus className="mr-2 h-4 w-4" />
-									Create Bus
-								</>
-							)}
-						</Button>
+					<DialogFooter className="gap-2 sm:justify-between">
+						{/* Delete Button Section */}
+						{!showDeleteConfirm ? (
+							<Button
+								type="button"
+								variant="destructive"
+								className="mr-auto"
+								onClick={() => setShowDeleteConfirm(true)}
+								disabled={isLoading || isDeleting}
+							>
+								<Trash className="mr-2 h-4 w-4" />
+								Delete
+							</Button>
+						) : (
+							<div className="flex gap-2 mr-auto animate-in fade-in-0 duration-200">
+								<Button
+									type="button"
+									variant="destructive"
+									onClick={handleDelete}
+									disabled={isDeleting}
+								>
+									{isDeleting ? (
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									) : (
+										<AlertTriangle className="mr-2 h-4 w-4" />
+									)}
+									Confirm Delete
+								</Button>
+								<Button
+									type="button"
+									variant="ghost"
+									className="text-gray-300 hover:text-white"
+									onClick={() => setShowDeleteConfirm(false)}
+									disabled={isDeleting}
+								>
+									Cancel
+								</Button>
+							</div>
+						)}
+
+						{/* Save/Cancel Buttons Section */}
+						<div className="flex gap-2">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setOpen(false)}
+								disabled={isLoading || isDeleting}
+								className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+							>
+								Cancel
+							</Button>
+							<Button
+								type="submit"
+								disabled={
+									isLoading ||
+									isDeleting ||
+									(isCustomStatus && !customStatus.trim())
+								}
+								className="bg-purple-600 hover:bg-purple-700 text-white"
+							>
+								{isLoading ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Saving...
+									</>
+								) : (
+									<>
+										<Save className="mr-2 h-4 w-4" />
+										Save Changes
+									</>
+								)}
+							</Button>
+						</div>
 					</DialogFooter>
 				</form>
 			</DialogContent>

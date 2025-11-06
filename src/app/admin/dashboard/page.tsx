@@ -18,7 +18,6 @@ export default async function AdminDashboardPage() {
 		.select()
 		.from(bus)
 		.orderBy(asc(bus.departureTime));
-	console.log(buses);
 
 	return (
 		<AdminDashboardClient
