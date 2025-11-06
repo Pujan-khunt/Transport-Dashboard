@@ -1,8 +1,25 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth/next-auth";
 import { db } from "@/db";
-import { bus } from "@/db/schema/bus";
+import { type Bus, bus } from "@/db/schema/bus";
+
+export async function GET(_req: NextRequest) {
+	try {
+		const buses: Bus[] = await db
+			.select()
+			.from(bus)
+			.orderBy(asc(bus.departureTime));
+
+		return NextResponse.json(buses, { status: 200 });
+	} catch (error) {
+		console.error("Error fetching buses:", error);
+		return NextResponse.json(
+			{ error: "Internal Server Error" },
+			{ status: 500 },
+		);
+	}
+}
 
 export async function DELETE(req: NextRequest) {
 	try {

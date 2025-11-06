@@ -1,12 +1,13 @@
 "use client";
 
-import { CheckCircle2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { CheckCircle2, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { BusCard } from "@/components/bus-card";
 import { PublicNavbar } from "@/components/public-navbar";
 import type { Bus } from "@/db/schema/bus";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
+const POLLING_INTERVAL_MS = 30 * 1000; // 30 seconds
 
 interface PublicDashboardClientProps {
 	initialBuses: Bus[];
@@ -15,16 +16,45 @@ interface PublicDashboardClientProps {
 export function PublicDashboardClient({
 	initialBuses,
 }: PublicDashboardClientProps) {
+	// Use state to hold buses, initializing with server-fetched data
+	const [buses, setBuses] = useState<Bus[]>(initialBuses);
 	const [selectedLocation, setSelectedLocation] =
 		useState<Location>("Uniworld-1");
+	const [isFetching, setIsFetching] = useState(false); // To show loading state
+
+	// Polling logic
+	useEffect(() => {
+		const fetchBuses = async () => {
+			setIsFetching(true);
+			try {
+				const response = await fetch("/api/buses"); // Call our new GET endpoint
+				if (!response.ok) {
+					throw new Error("Failed to fetch buses");
+				}
+				const newBuses: Bus[] = await response.json();
+				setBuses(newBuses); // Update the state with new data
+			} catch (error) {
+				console.error("Error polling for buses:", error);
+			} finally {
+				setIsFetching(false);
+			}
+		};
+
+		// Set up the interval
+		const intervalId = setInterval(fetchBuses, POLLING_INTERVAL_MS);
+
+		// Clean up the interval when the component unmounts
+		return () => clearInterval(intervalId);
+	}, []); // Empty dependency array means this runs once on mount
 
 	const filteredBuses = useMemo(() => {
-		return initialBuses.filter((bus) => {
+		// IMPORTANT: Use the 'buses' state variable, not 'initialBuses'
+		return buses.filter((bus) => {
 			return (
 				bus.origin === selectedLocation || bus.destination === selectedLocation
 			);
 		});
-	}, [initialBuses, selectedLocation]);
+	}, [buses, selectedLocation]); // Depend on 'buses' state
 
 	const { upcomingBuses, completedBuses, allCompleted } = useMemo(() => {
 		const now = new Date();
@@ -32,12 +62,30 @@ export function PublicDashboardClient({
 		const completed: Bus[] = [];
 
 		filteredBuses.forEach((bus) => {
-			if (new Date(bus.departureTime) > now) {
+			// Add a 5-minute grace period for "completed" status
+			const departureTime = new Date(bus.departureTime);
+			const completedTime = new Date(departureTime.getTime() + 5 * 60000); // 5 minutes after departure
+
+			if (completedTime > now) {
 				upcoming.push(bus);
 			} else {
 				completed.push(bus);
 			}
 		});
+
+		// Sort upcoming buses by departure time
+		upcoming.sort(
+			(a, b) =>
+				new Date(a.departureTime).getTime() -
+				new Date(b.departureTime).getTime(),
+		);
+
+		// Sort completed buses by departure time (most recent first)
+		completed.sort(
+			(a, b) =>
+				new Date(b.departureTime).getTime() -
+				new Date(a.departureTime).getTime(),
+		);
 
 		return {
 			upcomingBuses: upcoming,
@@ -52,6 +100,16 @@ export function PublicDashboardClient({
 				selectedCategory={selectedLocation}
 				onCategoryChange={setSelectedLocation}
 			/>
+
+			{/* Loading indicator for polling */}
+			{isFetching && (
+				<div className="fixed bottom-4 right-4 z-50">
+					<div className="flex items-center gap-2 rounded-full bg-gray-800 px-4 py-2 text-sm text-white border border-gray-700 shadow-lg">
+						<Loader2 className="h-4 w-4 animate-spin" />
+						<span>Updating...</span>
+					</div>
+				</div>
+			)}
 
 			<main className="px-6 py-6">
 				{allCompleted && (
