@@ -1,6 +1,10 @@
 "use client";
 
+import { LayoutDashboard, Menu } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
 	Sheet,
 	SheetClose,
@@ -9,27 +13,19 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
-import { LayoutDashboard, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { CurrentTimeDisplay } from "./current-time-display";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
-interface PublicNavbarProps {
-	selectedCategory: Location;
-	onCategoryChange: (category: Location) => void;
-}
+export function PublicNavbar() {
+	const searchParams = useSearchParams();
+	const selectedCategory = searchParams.get("location") || "Uniworld-1";
 
-export function PublicNavbar({
-	selectedCategory,
-	onCategoryChange,
-}: PublicNavbarProps) {
 	const locations: { value: Location; label: string }[] = [
 		{ value: "Uniworld-1", label: "Uniworld 1" },
 		{ value: "Uniworld-2", label: "Uniworld 2" },
-		{ value: "Macro", label: "Macro" },
+		{ value: "Macro", label: "Macro Campus" },
 		{ value: "Special", label: "Special" },
 	];
 
@@ -48,9 +44,9 @@ export function PublicNavbar({
 					{/* Center: Desktop Category Navigation (hidden on mobile) */}
 					<nav className="hidden lg:flex items-center gap-2">
 						{locations.map((location) => (
-							<button
+							<Link
+								href={`/dashboard?location=${location.value}`}
 								key={location.value}
-								onClick={() => onCategoryChange(location.value)}
 								className={cn(
 									"px-6 py-2 rounded-md text-sm font-medium transition-all",
 									selectedCategory === location.value
@@ -59,7 +55,7 @@ export function PublicNavbar({
 								)}
 							>
 								{location.label}
-							</button>
+							</Link>
 						))}
 					</nav>
 
@@ -111,24 +107,26 @@ export function PublicNavbar({
 
 								{/* Location Navigation */}
 								<div className="space-y-2">
-									<h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+									<h3 className="text-md text-center underline font-semibold text-gray-400 uppercase tracking-wider mb-3">
 										Locations
 									</h3>
-									{locations.map((location) => (
-										<SheetClose key={location.value} asChild>
-											<button
-												onClick={() => onCategoryChange(location.value)}
-												className={cn(
-													"w-full text-left px-4 py-2.5 rounded-md text-sm font-medium transition-all",
-													selectedCategory === location.value
-														? "bg-white text-black"
-														: "text-gray-400 hover:text-gray-200 hover:bg-gray-800",
-												)}
-											>
-												{location.label}
-											</button>
-										</SheetClose>
-									))}
+									<div className="flex flex-col items-center text-2xl gap-y-6">
+										{locations.map((location) => (
+											<SheetClose key={location.value}>
+												<Link
+													href={`/dashboard?location=${location.value}`}
+													className={cn(
+														"w-full text-left px-4 py-2.5 rounded-md text-sm font-medium transition-all",
+														selectedCategory === location.value
+															? "bg-white text-black"
+															: "text-gray-400 hover:text-gray-200 hover:bg-gray-800",
+													)}
+												>
+													{location.label}
+												</Link>
+											</SheetClose>
+										))}
+									</div>
 								</div>
 
 								<Separator className="bg-gray-800" />
@@ -137,7 +135,7 @@ export function PublicNavbar({
 								<Button
 									asChild
 									variant="outline"
-									className="w-full justify-start border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+									className="justify-center mx-10 py-4 border-gray-700 text-gray-300 bg-black hover:bg-gray-800 hover:text-white"
 								>
 									<Link href="/admin/dashboard">
 										<LayoutDashboard className="mr-2 h-4 w-4" />

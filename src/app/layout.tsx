@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import Providers from "@/components/Provider";
 
 const geistSans = Geist({
@@ -29,6 +30,9 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
 				<Providers>{children}</Providers>
+				<Analytics
+					mode={process.env.NODE_ENV as "development" | "production"}
+				/>
 			</body>
 		</html>
 	);

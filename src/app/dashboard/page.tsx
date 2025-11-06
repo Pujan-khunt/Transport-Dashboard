@@ -1,7 +1,7 @@
-import { PublicDashboardClient } from "./public-dashboard-client";
-import { db } from "@/db/index";
-import { Bus, bus } from "@/db/schema/bus";
 import { asc } from "drizzle-orm";
+import { db } from "@/db/index";
+import { type Bus, bus } from "@/db/schema/bus";
+import { PublicDashboardClient } from "./PublicDashboardClient";
 
 export default async function PublicDashboardPage() {
 	const buses: Bus[] = await db
