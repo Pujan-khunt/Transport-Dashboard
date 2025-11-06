@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import BusCompletedMessage from "@/components/BusCompletedMessage";
 import { BusCard } from "@/components/bus-card";
@@ -14,13 +15,15 @@ const POLLING_INTERVAL_MS = 30 * 1000; // 30 seconds
 
 interface PublicDashboardClientProps {
 	initialBuses: Bus[];
-	selectedLocation: Location;
 }
 
 export function PublicDashboardClient({
 	initialBuses,
-	selectedLocation,
 }: PublicDashboardClientProps) {
+	const searchParams = useSearchParams();
+	const selectedLocation =
+		(searchParams.get("location") as Location) || "Uniworld-1";
+
 	// Use state to hold buses, initializing with server-fetched data
 	const [buses, setBuses] = useState<Bus[]>(initialBuses);
 	const [isFetching, setIsFetching] = useState<boolean>(false); // To show loading state
