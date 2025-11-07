@@ -3,9 +3,9 @@
 import { useSearchParams } from "next/navigation";
 
 import CurrentTimeDisplay from "@/components/CurrentTimeDisplay";
-import DesktopCategoryNavigation from "@/components/DashboardCategoryNavigation";
+import DesktopAdminButton from "@/components/DashboardAdminButton";
+import DashboardCategoryNavigation from "@/components/DashboardCategoryNavigation";
 import DashboardLogoTitle from "@/components/DashboardLogoTitle";
-import DesktopAdminButton from "@/components/DesktopAdminButton";
 import MobileHamburgerMenu from "@/components/MobileHamburgerMenu";
 
 import type { Location } from "@/types/types";
@@ -23,7 +23,7 @@ export function PublicNavbar() {
 					<DashboardLogoTitle />
 
 					{/* Center: Desktop Category Navigation (hidden on mobile) */}
-					<DesktopCategoryNavigation selectedCategory={selectedCategory} />
+					<DashboardCategoryNavigation selectedCategory={selectedCategory} />
 
 					{/* Right: Desktop Time + Admin Button (hidden on mobile) */}
 					<CurrentTimeDisplay />

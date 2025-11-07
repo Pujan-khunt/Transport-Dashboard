@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { Bus } from "@/db/schema/bus";
 import { AdminNavbar } from "../../../components/admin-navbar";
@@ -22,8 +23,9 @@ export function AdminDashboardClient({
 	user,
 	initialBuses,
 }: AdminDashboardClientProps) {
-	const [selectedLocation, setSelectedLocation] =
-		useState<Location>("Uniworld-1");
+	const searchParams = useSearchParams();
+	const selectedLocation =
+		(searchParams.get("location") as Location) || "Uniworld-1";
 
 	// Filter buses based on selected location (source OR destination)
 	const filteredBuses = useMemo(() => {
@@ -57,11 +59,7 @@ export function AdminDashboardClient({
 
 	return (
 		<div className="min-h-screen bg-black">
-			<AdminNavbar
-				user={user}
-				selectedCategory={selectedLocation}
-				onCategoryChange={setSelectedLocation}
-			/>
+			<AdminNavbar user={user} selectedCategory={selectedLocation} />
 
 			<main className="px-6 py-6">
 				{/* Header Section */}

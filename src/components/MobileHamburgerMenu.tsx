@@ -1,17 +1,14 @@
-import { LayoutDashboard, Menu } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import Link from "next/link";
-import { locations } from "@/app/common";
+import CurrentTimeDisplay from "@/components/CurrentTimeDisplay";
+import DashboardAdminButton from "@/components/DashboardAdminButton";
+import HamburgerSheetTrigger from "@/components/HamburgerSheetTrigger";
+import MobileLocationNavigation from "@/components/MobileLocationNavigation";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-	Sheet,
-	SheetClose,
-	SheetContent,
-	SheetTrigger,
-} from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+
 import type { Location } from "@/types/types";
-import CurrentTimeDisplay from "./CurrentTimeDisplay";
-import { Button } from "./ui/button";
 
 function MobileHamburgerMenu({
 	selectedCategory,
@@ -20,53 +17,29 @@ function MobileHamburgerMenu({
 }) {
 	return (
 		<Sheet>
-			<SheetTrigger asChild>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="lg:hidden text-white hover:bg-gray-800"
-					aria-label="Open navigation menu"
-				>
-					<Menu className="h-6 w-6" />
-				</Button>
-			</SheetTrigger>
+			<HamburgerSheetTrigger />
 
 			<SheetContent side="right" className="w-[300px] bg-black border-gray-800">
-				<div className="flex flex-col gap-6 mt-6">
+				<SheetTitle className="hidden">Sidebar</SheetTitle>
+
+				<Separator className="bg-gray-800" />
+
+				<div className="flex flex-col gap-6">
 					{/* Current Time */}
-					<div>
-						<CurrentTimeDisplay className="text-md" />
-					</div>
+					<CurrentTimeDisplay className="text-md" />
 
 					<Separator className="bg-gray-800" />
 
 					{/* Location Navigation */}
-					<div className="space-y-2">
-						<h3 className="text-md text-center underline font-semibold text-gray-400 uppercase tracking-wider mb-3">
-							Locations
-						</h3>
-						<div className="flex flex-col items-center text-2xl gap-y-6">
-							{locations.map((location) => (
-								<SheetClose key={location.value}>
-									<Link
-										href={`/dashboard?location=${location.value}`}
-										className={cn(
-											"w-full text-left px-4 py-2.5 rounded-md text-sm font-medium transition-all",
-											selectedCategory === location.value
-												? "bg-white text-black"
-												: "text-gray-400 hover:text-gray-200 hover:bg-gray-800",
-										)}
-									>
-										{location.label}
-									</Link>
-								</SheetClose>
-							))}
-						</div>
-					</div>
+					<MobileLocationNavigation
+						locationUrl="/dashboard"
+						selectedCategory={selectedCategory}
+					/>
 
 					<Separator className="bg-gray-800" />
 
 					{/* Admin Dashboard Button */}
+					<DashboardAdminButton />
 					<Button
 						asChild
 						variant="outline"
