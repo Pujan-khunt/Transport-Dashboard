@@ -1,7 +1,9 @@
 "use client";
 
-import { LayoutDashboard, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import Link from "next/link";
+import { locations } from "@/app/common";
+import CurrentTimeDisplay from "@/components/CurrentTimeDisplay";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -13,39 +15,28 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import CurrentTimeDisplay from "./CurrentTimeDisplay"; // Import
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
 interface CategoryNavProps {
 	value: Location;
-	onChange: (value: Location) => void;
+	locationUrl: "/admin/dashboard" | "/dashboard";
 	className?: string;
-	showAdminButton?: boolean;
 }
 
 export function CategoryNav({
 	value,
-	onChange,
+	locationUrl,
 	className,
-	showAdminButton = false,
 }: CategoryNavProps) {
-	const locations: { value: Location; label: string }[] = [
-		{ value: "Uniworld-1", label: "Uniworld 1" },
-		{ value: "Uniworld-2", label: "Uniworld 2" },
-		{ value: "Macro", label: "Macro" },
-		{ value: "Special", label: "Special" },
-	];
-
 	return (
 		<nav className={cn(className)}>
 			{/* Desktop Nav */}
 			<div className="hidden items-center gap-2 md:flex">
 				{locations.map((location) => (
-					<Button
+					<Link
+						href={`${locationUrl}?location=${location.value}`}
 						key={location.value}
-						variant={value === location.value ? "default" : "ghost"}
-						onClick={() => onChange(location.value)}
 						className={cn(
 							"px-6 py-2 font-medium transition-all",
 							value === location.value
@@ -54,7 +45,7 @@ export function CategoryNav({
 						)}
 					>
 						{location.label}
-					</Button>
+					</Link>
 				))}
 			</div>
 
@@ -91,9 +82,8 @@ export function CategoryNav({
 							</p>
 							{locations.map((location) => (
 								<SheetClose asChild key={location.value}>
-									<Button
-										onClick={() => onChange(location.value)}
-										variant={value === location.value ? "secondary" : "ghost"}
+									<Link
+										href={`${locationUrl}?location=${location.value}`}
 										className={cn(
 											"w-full justify-start gap-2 text-base",
 											value === location.value
@@ -102,29 +92,10 @@ export function CategoryNav({
 										)}
 									>
 										{location.label}
-									</Button>
+									</Link>
 								</SheetClose>
 							))}
 						</div>
-						{showAdminButton && (
-							<>
-								<Separator className="bg-gray-700" />
-								<div className="grid gap-2 py-4">
-									<SheetClose asChild>
-										<Button
-											asChild
-											variant="ghost"
-											className="w-full justify-start gap-2 text-base text-gray-400 hover:text-gray-200"
-										>
-											<Link href="/admin/dashboard">
-												<LayoutDashboard className="h-5 w-5" />
-												Admin Dashboard
-											</Link>
-										</Button>
-									</SheetClose>
-								</div>
-							</>
-						)}
 					</SheetContent>
 				</Sheet>
 			</div>

@@ -11,7 +11,7 @@ function HamburgerButton() {
 				className="lg:hidden text-white hover:bg-gray-800"
 				aria-label="Open navigation menu"
 			>
-				<Menu className="h-6 w-6" />
+				<Menu className="h-12 w-12" />
 			</Button>
 		</SheetTrigger>
 	);

@@ -68,7 +68,7 @@ export function BusCard({ bus, isCompleted, isAdminView }: BusCardProps) {
 	return (
 		<Card
 			className={cn(
-				"relative group overflow-hidden bg-[#1a1a1a] border-gray-800 transition-all hover:border-gray-700",
+				"relative group overflow-hidden bg-[#1a1a1a] border-gray-300 transition-all hover:border-gray-700",
 				isCompleted && "opacity-55 border-gray-700/40",
 			)}
 		>
@@ -76,13 +76,10 @@ export function BusCard({ bus, isCompleted, isAdminView }: BusCardProps) {
 			{isAdminView && !isCompleted && (
 				<EditBusDialog bus={bus}>
 					<Button
-						variant="outline"
+						variant="ghost"
 						size="sm"
 						className={cn(
-							"absolute top-3 right-3 z-10",
-							"bg-gray-900/50 border-gray-700/60 text-gray-300",
-							"opacity-0 group-hover:opacity-100 transition-opacity", // Show on hover
-							"hover:bg-gray-800 hover:text-white hover:border-gray-600",
+							"absolute top-3 right-3 z-10 bg-gray-900/50 border-gray-700/60 text-gray-300",
 						)}
 					>
 						<Pencil className="h-4 w-4 mr-2" />

@@ -16,7 +16,7 @@ function DesktopCategoryNavigation({
 		<nav className={cn("hidden lg:flex items-center gap-2", className)}>
 			{locations.map((location) => (
 				<Link
-					href={`/dashboard?location=${location.value}`}
+					href={`/admin/dashboard?location=${location.value}`}
 					key={location.value}
 					className={cn(
 						"px-6 py-2 rounded-md text-sm font-medium transition-all",
