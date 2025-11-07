@@ -1,13 +1,18 @@
 import { CheckCircle2 } from "lucide-react";
+
 import type { Location } from "@/types/types";
+
+interface BusCompletedMessage {
+	selectedLocation: Location;
+	className?: string;
+}
 
 function BusCompletedMessage({
 	selectedLocation,
-}: {
-	selectedLocation: Location;
-}) {
+	className,
+}: BusCompletedMessage) {
 	return (
-		<>
+		<div className={className}>
 			<div className="rounded-full bg-green-500/10 p-6">
 				<CheckCircle2 className="h-16 w-16 text-green-500" />
 			</div>
@@ -19,7 +24,7 @@ function BusCompletedMessage({
 					All scheduled buses have departed. Check back later.
 				</p>
 			</div>
-		</>
+		</div>
 	);
 }
 

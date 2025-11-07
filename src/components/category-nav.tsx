@@ -1,6 +1,9 @@
 "use client";
 
+import { LayoutDashboard, Menu } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
 	Sheet,
 	SheetClose,
@@ -9,11 +12,8 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Menu } from "lucide-react";
-import Link from "next/link";
-import { CurrentTimeDisplay } from "./current-time-display"; // Import
+import CurrentTimeDisplay from "./CurrentTimeDisplay"; // Import
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 

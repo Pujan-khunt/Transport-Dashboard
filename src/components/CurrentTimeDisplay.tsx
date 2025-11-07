@@ -8,14 +8,15 @@ interface CurrentTimeDisplayProps {
 	className?: string;
 }
 
-export function CurrentTimeDisplay({
+function CurrentTimeDisplay({
 	variant = "default",
 	className,
 }: CurrentTimeDisplayProps) {
 	const [mounted, setMounted] = useState(false);
 	const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
-	useEffect(() => {
+	// Update display time every minute.
+	const updateDisplayTime = () => {
 		setMounted(true);
 		setCurrentTime(new Date());
 
@@ -24,7 +25,10 @@ export function CurrentTimeDisplay({
 		}, 60000); // Update every minute
 
 		return () => clearInterval(timer);
-	}, []);
+	};
+
+	// Run update timer function only once.
+	useEffect(updateDisplayTime, []);
 
 	// Render a loading state to prevent hydration mismatch
 	if (!mounted || !currentTime) {
@@ -57,6 +61,7 @@ export function CurrentTimeDisplay({
 		day: "numeric",
 	});
 
+	// Compact variant to fit time and date above each other.
 	if (variant === "compact") {
 		return (
 			<div className={cn("text-left", className)}>
@@ -68,11 +73,18 @@ export function CurrentTimeDisplay({
 		);
 	}
 
-	// Default variant
+	// Default variant with time and date on same line.
 	return (
-		<div className={cn("text-white flex items-center gap-x-6", className)}>
-			<p className="text-2xl">{dateString}</p>
-			<p className="text-2xl font-bold tabular-nums">{timeString}</p>
+		<div
+			className={cn(
+				"text-white text-sm md:text-2xl flex flex-col items-center gap-x-6",
+				className,
+			)}
+		>
+			<p>{dateString}</p>
+			<p className="font-bold tabular-nums">{timeString}</p>
 		</div>
 	);
 }
+
+export default CurrentTimeDisplay;

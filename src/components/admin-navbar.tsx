@@ -1,7 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { LogOut, Menu } from "lucide-react";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
 	Sheet,
 	SheetClose,
@@ -10,11 +13,8 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
-import { LogOut, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { CurrentTimeDisplay } from "./current-time-display";
+import CurrentTimeDisplay from "./CurrentTimeDisplay";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
@@ -62,7 +62,7 @@ export function AdminNavbar({
 					{/* Center: Desktop Category Navigation (hidden on mobile) */}
 					<nav className="hidden lg:flex items-center gap-2">
 						{locations.map((location) => (
-							<button
+							<Button
 								key={location.value}
 								onClick={() => onCategoryChange(location.value)}
 								className={cn(
@@ -73,7 +73,7 @@ export function AdminNavbar({
 								)}
 							>
 								{location.label}
-							</button>
+							</Button>
 						))}
 					</nav>
 
@@ -168,7 +168,7 @@ export function AdminNavbar({
 									</h3>
 									{locations.map((location) => (
 										<SheetClose key={location.value} asChild>
-											<button
+											<Button
 												onClick={() => onCategoryChange(location.value)}
 												className={cn(
 													"w-full text-left px-4 py-2.5 rounded-md text-sm font-medium transition-all",
@@ -178,7 +178,7 @@ export function AdminNavbar({
 												)}
 											>
 												{location.label}
-											</button>
+											</Button>
 										</SheetClose>
 									))}
 								</div>
