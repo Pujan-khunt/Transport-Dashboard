@@ -26,7 +26,7 @@ export function PublicNavbar() {
 					<DesktopCategoryNavigation selectedCategory={selectedCategory} />
 
 					{/* Right: Desktop Time + Admin Button (hidden on mobile) */}
-					<CurrentTimeDisplay variant="compact" />
+					<CurrentTimeDisplay />
 					<DesktopAdminButton />
 
 					{/* Right: Mobile Hamburger Menu */}

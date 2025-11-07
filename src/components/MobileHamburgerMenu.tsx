@@ -6,8 +6,6 @@ import {
 	Sheet,
 	SheetClose,
 	SheetContent,
-	SheetHeader,
-	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -34,10 +32,6 @@ function MobileHamburgerMenu({
 			</SheetTrigger>
 
 			<SheetContent side="right" className="w-[300px] bg-black border-gray-800">
-				<SheetHeader>
-					<SheetTitle className="text-white text-left">Menu</SheetTitle>
-				</SheetHeader>
-
 				<div className="flex flex-col gap-6 mt-6">
 					{/* Current Time */}
 					<div>
