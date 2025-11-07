@@ -80,18 +80,18 @@ export function PublicDashboardClient({
 		});
 
 		// Sort upcoming buses by departure time
-		upcoming.sort(
-			(a, b) =>
-				new Date(a.departureTime).getTime() -
-				new Date(b.departureTime).getTime(),
-		);
-
-		// Sort completed buses by departure time (most recent first)
-		completed.sort(
-			(a, b) =>
-				new Date(b.departureTime).getTime() -
-				new Date(a.departureTime).getTime(),
-		);
+		// upcoming.sort(
+		// 	(a, b) =>
+		// 		new Date(a.departureTime).getTime() -
+		// 		new Date(b.departureTime).getTime(),
+		// );
+		//
+		// // Sort completed buses by departure time (most recent first)
+		// completed.sort(
+		// 	(a, b) =>
+		// 		new Date(b.departureTime).getTime() -
+		// 		new Date(a.departureTime).getTime(),
+		// );
 
 		return {
 			upcomingBuses: upcoming,
