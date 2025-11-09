@@ -2,8 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { BusCard } from "@/components/BusCard";
 import BusCompletedMessage from "@/components/BusCompletedMessage";
-import { BusCard } from "@/components/bus-card";
 import CompletedBusesGrid from "@/components/CompletedBusesGrid";
 import LoadingIndicator from "@/components/LoadingIndicator";
 import NoBusMessage from "@/components/NoBusMessage";

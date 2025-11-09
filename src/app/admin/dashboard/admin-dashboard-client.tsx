@@ -2,11 +2,11 @@
 
 import { CheckCircle2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { Bus } from "@/db/schema/bus";
-import { AdminNavbar } from "../../../components/admin-navbar";
-import { BusCard } from "../../../components/bus-card";
-import { CreateBusDialog } from "../../../components/create-bus-dialog";
+import { AdminNavbar } from "../../../components/AdminNavbar";
+import { BusCard } from "../../../components/BusCard";
+import { CreateBusDialog } from "../../../components/CreateBusDialog";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 

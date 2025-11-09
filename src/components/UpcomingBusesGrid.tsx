@@ -1,4 +1,4 @@
-import { BusCard } from "@/components/bus-card";
+import { BusCard } from "@/components/BusCard";
 import type { Bus } from "@/db/schema/bus";
 
 function UpcomingBusesGrid({ upcomingBuses }: { upcomingBuses: Bus[] }) {

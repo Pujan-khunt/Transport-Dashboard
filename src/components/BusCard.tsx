@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"; // Import Button
 import { Card } from "@/components/ui/card";
 import type { Bus } from "@/db/schema/bus";
 import { cn } from "@/lib/utils";
-import { EditBusDialog } from "./edit-bus-dialog"; // Import the new dialog
+import { EditBusDialog } from "./EditBusDialog"; // Import the new dialog
 
 interface BusCardProps {
 	bus: Bus;

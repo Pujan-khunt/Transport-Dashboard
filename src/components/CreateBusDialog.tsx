@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Plus } from "lucide-react";
+import { ArrowUpDown, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,6 +55,14 @@ export function CreateBusDialog() {
 
 	const isCustomStatus = selectedStatus === "custom";
 	const finalStatus = isCustomStatus ? customStatus : selectedStatus;
+
+	const switchLocations = () => {
+		setFormData({
+			...formData,
+			origin: formData.destination,
+			destination: formData.origin,
+		});
+	};
 
 	const resetForm = () => {
 		setFormData({
@@ -173,7 +181,7 @@ export function CreateBusDialog() {
 							>
 								<SelectTrigger
 									id="origin"
-									className="bg-gray-900 border-gray-700 text-white"
+									className="bg-gray-900 min-w-32 border-gray-700 text-white"
 								>
 									<SelectValue placeholder="Select source location" />
 								</SelectTrigger>
@@ -191,25 +199,32 @@ export function CreateBusDialog() {
 							<Label htmlFor="destination" className="text-gray-300">
 								Destination
 							</Label>
-							<Select
-								value={formData.destination}
-								onValueChange={(value: Location) =>
-									setFormData({ ...formData, destination: value })
-								}
-							>
-								<SelectTrigger
-									id="destination"
-									className="bg-gray-900 border-gray-700 text-white"
+							<div className="flex gap-x-4 items-center">
+								<Select
+									value={formData.destination}
+									onValueChange={(value: Location) =>
+										setFormData({ ...formData, destination: value })
+									}
 								>
-									<SelectValue placeholder="Select destination location" />
-								</SelectTrigger>
-								<SelectContent className="bg-gray-900 border-gray-700 text-white">
-									<SelectItem value="Uniworld-1">Uniworld 1</SelectItem>
-									<SelectItem value="Uniworld-2">Uniworld 2</SelectItem>
-									<SelectItem value="Macro">Macro</SelectItem>
-									<SelectItem value="Special">Special</SelectItem>
-								</SelectContent>
-							</Select>
+									<SelectTrigger
+										id="destination"
+										className="bg-gray-900 min-w-32 border-gray-700 text-white"
+									>
+										<SelectValue placeholder="Select destination location" />
+									</SelectTrigger>
+									<SelectContent className="bg-gray-900 border-gray-700 text-white">
+										<SelectItem value="Uniworld-1">Uniworld 1</SelectItem>
+										<SelectItem value="Uniworld-2">Uniworld 2</SelectItem>
+										<SelectItem value="Macro">Macro</SelectItem>
+										<SelectItem value="Special">Special</SelectItem>
+									</SelectContent>
+								</Select>
+
+								<ArrowUpDown
+									onClick={switchLocations}
+									className="bg-gray-600 rounded-full p-1"
+								/>
+							</div>
 						</div>
 
 						{/* Special Destination Input (Conditional) */}
