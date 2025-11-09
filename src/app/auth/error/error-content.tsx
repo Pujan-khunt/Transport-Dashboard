@@ -1,7 +1,17 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import {
+	AlertCircle,
+	AlertTriangle,
+	Home,
+	Mail,
+	Settings,
+	ShieldAlert,
+	XCircle,
+} from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -11,16 +21,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-	XCircle,
-	ShieldAlert,
-	AlertTriangle,
-	Settings,
-	Mail,
-	Home,
-	AlertCircle,
-} from "lucide-react";
 
 // NextAuth error types with descriptions
 const ERROR_TYPES: Record<
@@ -119,23 +119,14 @@ export default function ErrorContent() {
 								workspace organization.
 							</>
 						)}
-						{error === "OAuthAccountNotLinked" && (
-							<>
-								Try signing in with the provider you originally used to create
-								your account.
-							</>
-						)}
-						{error === "Configuration" && (
-							<>Please contact support with this error code for assistance.</>
-						)}
-						{error === "Verification" && (
-							<>Request a new verification link to continue.</>
-						)}
-						{!ERROR_TYPES[error] && (
-							<>
-								If this problem persists, please contact support for assistance.
-							</>
-						)}
+						{error === "OAuthAccountNotLinked" &&
+							"Try signing in with the provider you originally used to create your account."}
+						{error === "Configuration" &&
+							"Please contact support with this error code for assistance."}
+						{error === "Verification" &&
+							"Request a new verification link to continue."}
+						{!ERROR_TYPES[error] &&
+							"If this problem persists, please contact support for assistance."}
 					</AlertDescription>
 				</Alert>
 			</CardContent>

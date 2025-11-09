@@ -114,7 +114,7 @@ export function EditBusDialog({ bus, children }: EditBusDialogProps) {
 			// Combine the original date with the new time
 			const departureDate = new Date(bus.departureTime); // Use original date to keep the day correct
 			const [hours, minutes] = formData.departureTime.split(":");
-			departureDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+			departureDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
 
 			const response = await fetch("/api/buses", {
 				method: "PUT",

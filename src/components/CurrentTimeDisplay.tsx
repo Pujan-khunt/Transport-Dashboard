@@ -77,7 +77,7 @@ function CurrentTimeDisplay({
 	return (
 		<div
 			className={cn(
-				"text-white text-sm md:text-2xl flex lg:flex-row flex-col items-center gap-x-6",
+				"text-white text-sm md:text-2xl flex md:flex-row flex-col items-center gap-x-6",
 				className,
 			)}
 		>

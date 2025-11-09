@@ -1,6 +1,6 @@
+import type { NextAuthConfig } from "next-auth";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import type { NextAuthConfig } from "next-auth";
 
 // Environment variable validation
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
@@ -58,7 +58,10 @@ export const authOptions: NextAuthConfig = {
 
 			// Check if user belongs to allowed workspace domains
 			const isAllowedDomain =
-				googleProfile.hd && ALLOWED_DOMAINS.includes(googleProfile.hd as any);
+				googleProfile.hd &&
+				ALLOWED_DOMAINS.includes(
+					googleProfile.hd as "scaler.com" | "sst.scaler.com",
+				);
 
 			if (googleProfile.email_verified && isAllowedDomain) {
 				console.log(

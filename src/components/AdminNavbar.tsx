@@ -1,13 +1,13 @@
 "use client";
 
-import { LogOut, Menu } from "lucide-react";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import CurrentTimeDisplay from "./CurrentTimeDisplay";
-import DesktopCategoryNavigation from "./DashboardCategoryNavigation";
-import DashboardLogoTitle from "./DashboardLogoTitle";
-import MobileHamburgerMenuAdmin from "./MobileHamburgerMenuAdmin";
+import CurrentTimeDisplay from "../CurrentTimeDisplay";
+import DesktopCategoryNavigation from "../DashboardCategoryNavigation";
+import DashboardLogoTitle from "../DashboardLogoTitle";
+import MobileHamburgerMenuAdmin from "../MobileHamburgerMenuAdmin";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 

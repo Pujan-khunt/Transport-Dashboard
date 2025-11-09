@@ -1,6 +1,7 @@
 import { asc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth/next-auth";
+import Navbar from "@/components/navbar/Navbar";
 import { db } from "@/db/index";
 import { type Bus, bus } from "@/db/schema/bus";
 import { AdminDashboardClient } from "./admin-dashboard-client";
@@ -20,13 +21,17 @@ export default async function AdminDashboardPage() {
 		.orderBy(asc(bus.departureTime));
 
 	return (
-		<AdminDashboardClient
-			user={{
-				name: session.user.name,
-				email: session.user.email,
-				image: session.user.image,
-			}}
-			initialBuses={buses}
-		/>
+		<>
+			<Navbar />
+
+			<AdminDashboardClient
+				user={{
+					name: session.user.name,
+					email: session.user.email,
+					image: session.user.image,
+				}}
+				initialBuses={buses}
+			/>
+		</>
 	);
 }

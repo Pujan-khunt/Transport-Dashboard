@@ -1,5 +1,5 @@
-import { auth } from "@/auth/next-auth";
 import { redirect } from "next/navigation";
+import { auth } from "@/auth/next-auth";
 import SignOutForm from "./sign-out-form";
 
 export default async function SignOutPage() {

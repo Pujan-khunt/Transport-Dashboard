@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { AlertCircle, Loader2, ShieldCheck } from "lucide-react";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -11,8 +13,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, AlertCircle, ShieldCheck } from "lucide-react";
 
 export default function SignInForm() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +25,7 @@ export default function SignInForm() {
 
 			// Trigger Google OAuth sign-in
 			await signIn("google", {
-				callbackUrl: "/admin/dashboard",
+				callbackUrl: "/dashboard",
 				redirect: true,
 			});
 		} catch (err) {
@@ -73,6 +73,7 @@ export default function SignInForm() {
 								viewBox="0 0 24 24"
 								xmlns="http://www.w3.org/2000/svg"
 							>
+								<title>Google Logo</title>
 								<path
 									fill="currentColor"
 									d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

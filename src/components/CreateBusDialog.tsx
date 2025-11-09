@@ -99,7 +99,7 @@ export function CreateBusDialog() {
 			// Combine today's date with the selected time
 			const today = new Date();
 			const [hours, minutes] = formData.departureTime.split(":");
-			today.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+			today.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
 
 			const response = await fetch("/api/buses", {
 				method: "POST",

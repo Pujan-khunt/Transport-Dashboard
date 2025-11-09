@@ -7,7 +7,7 @@ export default async function SignInPage() {
 	const session = await auth();
 
 	if (session?.user.isAdmin) {
-		redirect("/admin/dashboard");
+		redirect("/dashboard");
 	}
 
 	return (

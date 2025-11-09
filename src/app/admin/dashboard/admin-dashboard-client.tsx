@@ -4,23 +4,16 @@ import { CheckCircle2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import type { Bus } from "@/db/schema/bus";
-import { AdminNavbar } from "../../../components/AdminNavbar";
 import { BusCard } from "../../../components/BusCard";
 import { CreateBusDialog } from "../../../components/CreateBusDialog";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
 interface AdminDashboardClientProps {
-	user: {
-		name?: string | null;
-		email?: string | null;
-		image?: string | null;
-	};
 	initialBuses: Bus[];
 }
 
 export function AdminDashboardClient({
-	user,
 	initialBuses,
 }: AdminDashboardClientProps) {
 	const searchParams = useSearchParams();
@@ -59,8 +52,6 @@ export function AdminDashboardClient({
 
 	return (
 		<div className="min-h-screen bg-black">
-			<AdminNavbar user={user} selectedCategory={selectedLocation} />
-
 			<main className="px-6 py-6">
 				{/* Header Section */}
 				<div className="flex items-center justify-between mb-8">

@@ -4,11 +4,11 @@ import { useSearchParams } from "next/navigation";
 
 import CurrentTimeDisplay from "@/components/CurrentTimeDisplay";
 import DesktopAdminButton from "@/components/DashboardAdminButton";
-import DashboardCategoryNavigation from "@/components/DashboardCategoryNavigation";
-import DashboardLogoTitle from "@/components/DashboardLogoTitle";
-import MobileHamburgerMenu from "@/components/MobileHamburgerMenu";
+import HamburgerMenu from "@/components/navbar/HamburgerMenu";
 
 import type { Location } from "@/types/types";
+import DashboardCategoryNavigation from "./DashboardCategoryNavigation";
+import DashboardLogoTitle from "./DashboardLogoTitle";
 
 export function PublicNavbar() {
 	const searchParams = useSearchParams();
@@ -30,7 +30,7 @@ export function PublicNavbar() {
 					<DesktopAdminButton />
 
 					{/* Right: Mobile Hamburger Menu */}
-					<MobileHamburgerMenu selectedCategory={selectedCategory} />
+					<HamburgerMenu selectedCategory={selectedCategory} />
 				</div>
 			</div>
 		</nav>
