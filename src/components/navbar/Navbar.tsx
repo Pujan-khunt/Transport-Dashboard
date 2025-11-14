@@ -29,10 +29,7 @@ function Navbar() {
 					<DashboardLogoTitle />
 
 					{/* Desktop Category Navigation (hidden on mobile) */}
-					<DashboardCategoryNavigation
-						isAdmin={status == "authenticated"}
-						selectedCategory={selectedCategory}
-					/>
+					<DashboardCategoryNavigation selectedCategory={selectedCategory} />
 
 					{/* Current Time */}
 					<CurrentTimeDisplay />

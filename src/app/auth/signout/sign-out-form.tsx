@@ -27,7 +27,7 @@ export default function SignOutForm({ user }: SignOutFormProps) {
 
 	const handleSignOut = async () => {
 		setIsLoading(true);
-		await signOut({ callbackUrl: "/" });
+		await signOut({ callbackUrl: "/dashboard" });
 	};
 
 	const initials =
@@ -78,7 +78,7 @@ export default function SignOutForm({ user }: SignOutFormProps) {
 					)}
 				</Button>
 				<Button asChild variant="outline" className="w-full">
-					<a href="/admin/dashboard">Cancel</a>
+					<a href="/dashboard">Cancel</a>
 				</Button>
 			</CardFooter>
 		</Card>

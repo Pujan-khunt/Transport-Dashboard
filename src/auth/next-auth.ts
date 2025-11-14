@@ -139,7 +139,7 @@ export const authOptions: NextAuthConfig = {
 		async redirect({ url, baseUrl }) {
 			// After successful sign-in, redirect to admin dashboard
 			if (url === baseUrl || url === `${baseUrl}/`) {
-				return `${baseUrl}/admin/dashboard`;
+				return `${baseUrl}/dashboard?location=Uniworld-1`;
 			}
 
 			// Handle relative URLs
@@ -158,7 +158,7 @@ export const authOptions: NextAuthConfig = {
 			}
 
 			// Default: redirect to admin dashboard
-			return `${baseUrl}/admin/dashboard`;
+			return `${baseUrl}/dashboard?location=Uniworld-1`;
 		},
 	},
 };
