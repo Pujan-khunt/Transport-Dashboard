@@ -11,6 +11,7 @@ import UpcomingBusesGrid from "@/components/UpcomingBusesGrid";
 import type { Bus } from "@/db/schema/bus";
 import type { Location } from "@/types/types";
 import { CreateBusDialog } from "@/components/CreateBusDialog";
+import CsvUploadButton from "@/components/UploadButton";
 
 const POLLING_INTERVAL_MS = 30 * 1000; // 30 seconds
 
@@ -111,6 +112,7 @@ export function PublicDashboardClient({
 			{isAdmin && (
 				<div className="flex items-center justify-between p-4">
 					<CreateBusDialog />
+					<CsvUploadButton />
 				</div>
 			)}
 
