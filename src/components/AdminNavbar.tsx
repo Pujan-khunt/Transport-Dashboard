@@ -4,10 +4,10 @@ import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import CurrentTimeDisplay from "../CurrentTimeDisplay";
-import DesktopCategoryNavigation from "../DashboardCategoryNavigation";
-import DashboardLogoTitle from "../DashboardLogoTitle";
-import MobileHamburgerMenuAdmin from "../MobileHamburgerMenuAdmin";
+import CurrentTimeDisplay from "@/components/CurrentTimeDisplay";
+import DesktopCategoryNavigation from "@/components/DashboardCategoryNavigation";
+import DashboardLogoTitle from "@/components/DashboardLogoTitle";
+// import MobileHamburgerMenuAdmin from "@/components/MobileLocationNavigation";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
@@ -72,11 +72,11 @@ export function AdminNavbar({ user, selectedCategory }: AdminNavbarProps) {
 					</div>
 
 					{/* Right: Mobile Hamburger Menu */}
-					<MobileHamburgerMenuAdmin
+					{/* <MobileHamburgerMenuAdmin
 						initials={initials}
 						user={user}
 						selectedCategory={selectedCategory}
-					/>
+					/> */}
 				</div>
 			</div>
 		</nav>

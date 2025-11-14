@@ -6,10 +6,15 @@ import { useMemo } from "react";
 import type { Bus } from "@/db/schema/bus";
 import { BusCard } from "../../../components/BusCard";
 import { CreateBusDialog } from "../../../components/CreateBusDialog";
-
+import CsvUploadButton from "@/components/UploadButton";
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
 
 interface AdminDashboardClientProps {
+	user: {
+    name: string | null | undefined;
+    email: string;
+    image: string | null | undefined;
+  	};
 	initialBuses: Bus[];
 }
 
@@ -56,6 +61,8 @@ export function AdminDashboardClient({
 				{/* Header Section */}
 				<div className="flex items-center justify-between mb-8">
 					<CreateBusDialog />
+					<CsvUploadButton/>
+					
 				</div>
 
 				{/* All Buses Completed Message */}
