@@ -6,12 +6,10 @@ import type { Location } from "@/types/types";
 
 interface MobileLocationNavigationProps {
 	selectedCategory: Location;
-	locationUrl: "/admin/dashboard" | "/dashboard";
 }
 
 function MobileLocationNavigation({
 	selectedCategory,
-	locationUrl = "/dashboard",
 }: MobileLocationNavigationProps) {
 	return (
 		<div className="space-y-2">
@@ -22,7 +20,7 @@ function MobileLocationNavigation({
 				{locations.map((location) => (
 					<SheetClose key={location.value}>
 						<Link
-							href={`${locationUrl}?location=${location.value}`}
+							href={`/dashboard?location=${location.value}`}
 							prefetch={true}
 							className={cn(
 								"w-full text-left px-4 py-2.5 rounded-md text-sm font-medium transition-all",

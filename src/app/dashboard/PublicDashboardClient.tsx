@@ -10,15 +10,18 @@ import NoBusMessage from "@/components/NoBusMessage";
 import UpcomingBusesGrid from "@/components/UpcomingBusesGrid";
 import type { Bus } from "@/db/schema/bus";
 import type { Location } from "@/types/types";
+import { CreateBusDialog } from "@/components/CreateBusDialog";
 
 const POLLING_INTERVAL_MS = 30 * 1000; // 30 seconds
 
 interface PublicDashboardClientProps {
 	initialBuses: Bus[];
+	isAdmin: boolean;
 }
 
 export function PublicDashboardClient({
 	initialBuses,
+	isAdmin,
 }: PublicDashboardClientProps) {
 	const searchParams = useSearchParams();
 	const selectedLocation =
@@ -104,6 +107,12 @@ export function PublicDashboardClient({
 		<div className="min-h-screen bg-black">
 			{/* Display "Updating..." when fetching bus data from server */}
 			{isFetching && <LoadingIndicator />}
+
+			{isAdmin && (
+				<div className="flex items-center justify-between p-4">
+					<CreateBusDialog />
+				</div>
+			)}
 
 			<main className="px-6 py-6">
 				{allCompleted && (

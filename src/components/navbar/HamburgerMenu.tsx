@@ -44,12 +44,7 @@ function HamburgerMenu({
 					<Separator className="bg-gray-800" />
 
 					{/* Location Navigation */}
-					<MobileLocationNavigation
-						locationUrl={
-							status === "authenticated" ? "/admin/dashboard" : "/dashboard"
-						}
-						selectedCategory={selectedCategory}
-					/>
+					<MobileLocationNavigation selectedCategory={selectedCategory} />
 
 					<Separator className="bg-gray-800" />
 
