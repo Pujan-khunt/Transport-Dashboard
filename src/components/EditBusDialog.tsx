@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertTriangle, ArrowUpDown, Loader2, Save, Trash } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -84,6 +84,20 @@ export function EditBusDialog({ bus, children }: EditBusDialogProps) {
 		isPaid: bus.isPaid,
 	});
 
+	const [time, setTime] = useState({
+		hour: "12",
+		minute: "00",
+		period: "AM",
+	});
+
+	useEffect(() => {
+		let h = parseInt(time.hour, 10);
+		if (time.period === "PM" && h < 12) h += 12;
+		if (time.period === "AM" && h === 12) h = 0;
+		const timeString = `${h.toString().padStart(2, "0")}:${time.minute}`;
+		setFormData((prev) => ({ ...prev, departureTime: timeString }));
+	}, [time]);
+
 	const showSpecialDestination =
 		formData.origin === "Special" || formData.destination === "Special";
 
@@ -102,6 +116,13 @@ export function EditBusDialog({ bus, children }: EditBusDialogProps) {
 			// Validate form fields
 			if (showSpecialDestination && !formData.specialDestination.trim()) {
 				alert("Please enter the special destination location");
+				setIsLoading(false);
+				return;
+			}
+
+			// Validate source and destination are not the same
+			if (formData.origin === formData.destination) {
+				alert("Source and destination cannot be the same");
 				setIsLoading(false);
 				return;
 			}
@@ -196,6 +217,15 @@ export function EditBusDialog({ bus, children }: EditBusDialogProps) {
 				departureTime: formatTime(bus.departureTime),
 				isPaid: bus.isPaid,
 			});
+
+			const date = new Date(bus.departureTime);
+			let hours = date.getHours();
+			const minutes = date.getMinutes().toString().padStart(2, "0");
+			const period = hours >= 12 ? "PM" : "AM";
+			if (hours > 12) hours -= 12;
+			if (hours === 0) hours = 12;
+			setTime({ hour: hours.toString(), minute: minutes, period });
+
 			setSelectedStatus(initialStatus);
 			setCustomStatus(initialCustomStatus);
 			setShowDeleteConfirm(false);
@@ -310,19 +340,61 @@ export function EditBusDialog({ bus, children }: EditBusDialogProps) {
 
 						{/* Departure Time */}
 						<div className="grid gap-2">
-							<Label htmlFor="departureTime" className="text-gray-300">
-								Departure Time
-							</Label>
-							<Input
-								id="departureTime"
-								type="time"
-								value={formData.departureTime}
-								onChange={(e) =>
-									setFormData({ ...formData, departureTime: e.target.value })
-								}
-								required
-								className="bg-gray-900 border-gray-700 text-white"
-							/>
+							<Label className="text-gray-300">Departure Time</Label>
+							<div className="flex gap-2 items-center">
+								{/* Hour */}
+								<Select
+									value={time.hour}
+									onValueChange={(v) => setTime({ ...time, hour: v })}
+								>
+									<SelectTrigger className="bg-gray-900 border-gray-700 text-white w-[70px]">
+										<SelectValue placeholder="HH" />
+									</SelectTrigger>
+									<SelectContent className="bg-gray-900 border-gray-700 text-white max-h-[200px]">
+										{Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+											<SelectItem key={h} value={h.toString()}>
+												{h.toString().padStart(2, "0")}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+
+								<span className="text-white font-bold">:</span>
+
+								{/* Minute */}
+								<Select
+									value={time.minute}
+									onValueChange={(v) => setTime({ ...time, minute: v })}
+								>
+									<SelectTrigger className="bg-gray-900 border-gray-700 text-white w-[70px]">
+										<SelectValue placeholder="MM" />
+									</SelectTrigger>
+									<SelectContent className="bg-gray-900 border-gray-700 text-white max-h-[200px]">
+										{Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (
+											<SelectItem
+												key={m}
+												value={m.toString().padStart(2, "0")}
+											>
+												{m.toString().padStart(2, "0")}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+
+								{/* Period */}
+								<Select
+									value={time.period}
+									onValueChange={(v) => setTime({ ...time, period: v })}
+								>
+									<SelectTrigger className="bg-gray-900 border-gray-700 text-white w-[70px]">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent className="bg-gray-900 border-gray-700 text-white">
+										<SelectItem value="AM">AM</SelectItem>
+										<SelectItem value="PM">PM</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
 						</div>
 
 						{/* Type (Paid/Free) */}
