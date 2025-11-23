@@ -41,7 +41,7 @@ export default function SignInForm() {
 				<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
 					<ShieldCheck className="h-6 w-6 text-blue-600 dark:text-blue-400" />
 				</div>
-				<CardTitle className="text-2xl font-bold">Admin Portal</CardTitle>
+				<CardTitle className="text-2xl font-bold">Welcome to SST Transit</CardTitle>
 				<CardDescription>
 					Sign in with your Scaler workspace account
 				</CardDescription>

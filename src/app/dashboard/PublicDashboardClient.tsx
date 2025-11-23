@@ -89,8 +89,8 @@ export function PublicDashboardClient({
 		// 		new Date(a.departureTime).getTime() -
 		// 		new Date(b.departureTime).getTime(),
 		// );
-		//
-		// // Sort completed buses by departure time (most recent first)
+		
+		// Sort completed buses by departure time (most recent first)
 		// completed.sort(
 		// 	(a, b) =>
 		// 		new Date(b.departureTime).getTime() -
