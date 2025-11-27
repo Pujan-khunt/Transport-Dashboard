@@ -44,9 +44,7 @@ export default function SignInForm() {
 				<CardTitle className="text-2xl font-bold">
 					Welcome to SST Transit
 				</CardTitle>
-				<CardDescription>
-					Sign in with your Scaler workspace account
-				</CardDescription>
+				<CardDescription>Sign in to access the dashboard</CardDescription>
 			</CardHeader>
 
 			<CardContent className="space-y-4">
@@ -101,10 +99,7 @@ export default function SignInForm() {
 
 			<CardFooter>
 				<p className="text-center text-sm text-muted-foreground w-full">
-					Only accounts from{" "}
-					<span className="font-medium text-foreground">scaler.com</span> or{" "}
-					<span className="font-medium text-foreground">sst.scaler.com</span>{" "}
-					are allowed
+					This application is restricted to authorized personnel only.
 				</p>
 			</CardFooter>
 		</Card>

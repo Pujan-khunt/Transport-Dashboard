@@ -43,7 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			};
 
 			// If true, login proceeds. If false, redirects to /auth/error?error=AccessDenied
-			if (googleProfile.email_verified) {
+			if (googleProfile.email_verified && googleProfile.email && ADMIN_EMAILS.includes(googleProfile.email)) {
 				return true;
 			}
 

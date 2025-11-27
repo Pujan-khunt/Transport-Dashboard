@@ -35,7 +35,7 @@ const ERROR_TYPES: Record<
 	AccessDenied: {
 		title: "Access Denied",
 		description:
-			"Your account does not have permission to access this application. Only Scaler workspace accounts (scaler.com or sst.scaler.com) are allowed.",
+			"Your account is not authorized to access this application. Please ensure you are using an allowed email address.",
 		icon: ShieldAlert,
 		severity: "error",
 	},
@@ -114,9 +114,8 @@ export default function ErrorContent() {
 					<AlertDescription>
 						{error === "AccessDenied" && (
 							<>
-								Please ensure you're using a Google account from{" "}
-								<strong>scaler.com</strong> or <strong>sst.scaler.com</strong>{" "}
-								workspace organization.
+								Please ensure you are using an authorized email address. Contact
+								the administrator if you believe this is an error.
 							</>
 						)}
 						{error === "OAuthAccountNotLinked" &&
