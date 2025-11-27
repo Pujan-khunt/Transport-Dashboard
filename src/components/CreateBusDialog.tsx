@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowUpDown, Loader2, Plus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -21,7 +21,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-// import { useRouter } from "next/navigation"; // Removed to prevent potential build errors
 import { cn } from "@/lib/utils";
 
 type Location = "Uniworld-1" | "Uniworld-2" | "Macro" | "Special";
@@ -37,14 +36,18 @@ const PRESET_STATUSES = [
 ];
 
 export function CreateBusDialog() {
-	// const router = useRouter(); // Removed
 	const [open, setOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [selectedStatus, setSelectedStatus] = useState<string>("On Time");
 	const [customStatus, setCustomStatus] = useState("");
+
+	// Date state for special buses (YYYY-MM-DD)
+	const [scheduleDate, setScheduleDate] = useState("");
+
 	const [formData, setFormData] = useState({
 		origin: "" as Location | "",
 		destination: "" as Location | "",
+		specialOrigin: "",
 		specialDestination: "",
 		departureTime: "",
 		isPaid: true,
@@ -56,6 +59,15 @@ export function CreateBusDialog() {
 		period: "AM",
 	});
 
+	// Initialize date on mount
+	useEffect(() => {
+		const today = new Date();
+		const yyyy = today.getFullYear();
+		const mm = String(today.getMonth() + 1).padStart(2, "0");
+		const dd = String(today.getDate()).padStart(2, "0");
+		setScheduleDate(`${yyyy}-${mm}-${dd}`);
+	}, []);
+
 	useEffect(() => {
 		let h = parseInt(time.hour, 10);
 		if (time.period === "PM" && h < 12) h += 12;
@@ -64,8 +76,10 @@ export function CreateBusDialog() {
 		setFormData((prev) => ({ ...prev, departureTime: timeString }));
 	}, [time]);
 
-	const showSpecialDestination =
-		formData.origin === "Special" || formData.destination === "Special";
+	const isSpecialOrigin = formData.origin === "Special";
+	const isSpecialDestination = formData.destination === "Special";
+	// If either is special, we show the date picker
+	const showDatePicker = isSpecialOrigin || isSpecialDestination;
 
 	const isCustomStatus = selectedStatus === "custom";
 	const finalStatus = isCustomStatus ? customStatus : selectedStatus;
@@ -75,6 +89,9 @@ export function CreateBusDialog() {
 			...formData,
 			origin: formData.destination,
 			destination: formData.origin,
+			// Swap special text as well if needed, though usually cleared
+			specialOrigin: formData.specialDestination,
+			specialDestination: formData.specialOrigin,
 		});
 	};
 
@@ -82,6 +99,7 @@ export function CreateBusDialog() {
 		setFormData({
 			origin: "",
 			destination: "",
+			specialOrigin: "",
 			specialDestination: "",
 			departureTime: "",
 			isPaid: true,
@@ -90,6 +108,13 @@ export function CreateBusDialog() {
 		setSelectedStatus("On Time");
 		setCustomStatus("");
 		setIsLoading(false);
+
+		// Reset date to today
+		const today = new Date();
+		const yyyy = today.getFullYear();
+		const mm = String(today.getMonth() + 1).padStart(2, "0");
+		const dd = String(today.getDate()).padStart(2, "0");
+		setScheduleDate(`${yyyy}-${mm}-${dd}`);
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -97,31 +122,42 @@ export function CreateBusDialog() {
 		setIsLoading(true);
 
 		try {
-			// Validate special destination if Special is selected
-			if (showSpecialDestination && !formData.specialDestination.trim()) {
+			// Validation
+			if (isSpecialOrigin && !formData.specialOrigin.trim()) {
+				alert("Please enter the special source location");
+				setIsLoading(false);
+				return;
+			}
+			if (isSpecialDestination && !formData.specialDestination.trim()) {
 				alert("Please enter the special destination location");
 				setIsLoading(false);
 				return;
 			}
-
-			// Validate source and destination are not the same
-			if (formData.origin === formData.destination) {
+			
+			if (!(formData.origin === "Special" || formData.destination === "Special") && formData.origin === formData.destination) {
 				alert("Source and destination cannot be the same");
 				setIsLoading(false);
 				return;
 			}
 
-			// Validate custom status
 			if (isCustomStatus && !customStatus.trim()) {
 				alert("Please enter a custom status");
 				setIsLoading(false);
 				return;
 			}
 
-			// Combine today's date with the selected time
-			const today = new Date();
+			// Construct Date
+			let finalDate: Date;
+			if (showDatePicker && scheduleDate) {
+				// Use selected date
+				finalDate = new Date(scheduleDate);
+			} else {
+				// Use today
+				finalDate = new Date();
+			}
+
 			const [hours, minutes] = formData.departureTime.split(":");
-			today.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+			finalDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
 
 			const response = await fetch("/api/buses", {
 				method: "POST",
@@ -129,10 +165,11 @@ export function CreateBusDialog() {
 				body: JSON.stringify({
 					origin: formData.origin,
 					destination: formData.destination,
-					specialDestination: showSpecialDestination
+					specialOrigin: isSpecialOrigin ? formData.specialOrigin : null,
+					specialDestination: isSpecialDestination
 						? formData.specialDestination
 						: null,
-					departureTime: today.toISOString(),
+					departureTime: finalDate.toISOString(),
 					status: finalStatus,
 					isPaid: formData.isPaid,
 				}),
@@ -140,11 +177,9 @@ export function CreateBusDialog() {
 
 			if (!response.ok) throw new Error("Failed to create bus");
 
-			// Reset form and close dialog
 			resetForm();
 			setOpen(false);
-			// router.refresh();
-			window.location.reload(); // Use full page reload
+			window.location.reload();
 		} catch (error) {
 			console.error("Error creating bus:", error);
 			alert("Failed to create bus. Please try again.");
@@ -155,7 +190,6 @@ export function CreateBusDialog() {
 
 	const handleStatusChange = (value: string) => {
 		setSelectedStatus(value);
-		// Clear custom status when switching away from custom
 		if (value !== "custom") {
 			setCustomStatus("");
 		}
@@ -167,7 +201,7 @@ export function CreateBusDialog() {
 			onOpenChange={(isOpen) => {
 				setOpen(isOpen);
 				if (!isOpen) {
-					resetForm(); // Reset form when dialog is closed
+					resetForm();
 				}
 			}}
 		>
@@ -184,8 +218,7 @@ export function CreateBusDialog() {
 							Add New Bus Schedule
 						</DialogTitle>
 						<DialogDescription className="text-gray-400">
-							Create a new bus entry for today. All buses are scheduled for the
-							current date.
+							Create a new bus entry.
 						</DialogDescription>
 					</DialogHeader>
 
@@ -216,6 +249,28 @@ export function CreateBusDialog() {
 							</Select>
 						</div>
 
+						{/* Special Origin Input */}
+						{isSpecialOrigin && (
+							<div className="grid gap-2">
+								<Label htmlFor="specialOrigin" className="text-gray-300">
+									Special Source Name
+								</Label>
+								<Input
+									id="specialOrigin"
+									placeholder="e.g., Airport, Railway Station"
+									value={formData.specialOrigin}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											specialOrigin: e.target.value,
+										})
+									}
+									required={isSpecialOrigin}
+									className="bg-gray-900 border-gray-700 text-white"
+								/>
+							</div>
+						)}
+
 						{/* Destination Dropdown */}
 						<div className="grid gap-2">
 							<Label htmlFor="destination" className="text-gray-300">
@@ -244,16 +299,16 @@ export function CreateBusDialog() {
 
 								<ArrowUpDown
 									onClick={switchLocations}
-									className="bg-gray-600 rounded-full p-1"
+									className="bg-gray-600 rounded-full p-1 cursor-pointer hover:bg-gray-500"
 								/>
 							</div>
 						</div>
 
-						{/* Special Destination Input (Conditional) */}
-						{showSpecialDestination && (
+						{/* Special Destination Input */}
+						{isSpecialDestination && (
 							<div className="grid gap-2">
 								<Label htmlFor="specialDestination" className="text-gray-300">
-									Special Destination Location
+									Special Destination Name
 								</Label>
 								<Input
 									id="specialDestination"
@@ -265,18 +320,34 @@ export function CreateBusDialog() {
 											specialDestination: e.target.value,
 										})
 									}
-									required={showSpecialDestination}
+									required={isSpecialDestination}
 									className="bg-gray-900 border-gray-700 text-white"
 								/>
-								<p className="text-xs text-gray-500">
-									Enter the specific location for the special route
-								</p>
+							</div>
+						)}
+
+						{/* Date Picker (Only if special) */}
+						{showDatePicker && (
+							<div className="grid gap-2">
+								<Label htmlFor="date" className="text-gray-300">
+									Date
+								</Label>
+								<Input
+									type="date"
+									id="date"
+									value={scheduleDate}
+									onChange={(e) => setScheduleDate(e.target.value)}
+									className="bg-gray-900 border-gray-700 text-white scheme-dark"
+									required
+								/>
 							</div>
 						)}
 
 						{/* Departure Time */}
 						<div className="grid gap-2">
-							<Label className="text-gray-300">Departure Time (Today)</Label>
+							<Label className="text-gray-300">
+								Departure Time {showDatePicker ? "" : "(Today)"}
+							</Label>
 							<div className="flex gap-2 items-center">
 								{/* Hour */}
 								<Select
@@ -307,10 +378,7 @@ export function CreateBusDialog() {
 									</SelectTrigger>
 									<SelectContent className="bg-gray-900 border-gray-700 text-white max-h-[200px]">
 										{Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (
-											<SelectItem
-												key={m}
-												value={m.toString().padStart(2, "0")}
-											>
+											<SelectItem key={m} value={m.toString().padStart(2, "0")}>
 												{m.toString().padStart(2, "0")}
 											</SelectItem>
 										))}
@@ -331,12 +399,9 @@ export function CreateBusDialog() {
 									</SelectContent>
 								</Select>
 							</div>
-							<p className="text-xs text-gray-500">
-								Bus will be scheduled for today at the selected time
-							</p>
 						</div>
 
-						{/* Type (Paid/Free) */}
+						{/* Type (Paid/Free) and Status... (Rest is largely same) */}
 						<div className="grid gap-2">
 							<Label htmlFor="isPaid" className="text-gray-300">
 								Type
@@ -360,7 +425,7 @@ export function CreateBusDialog() {
 							</Select>
 						</div>
 
-						{/* Status Dropdown with Custom Option */}
+						{/* Status */}
 						<div className="grid gap-2">
 							<Label htmlFor="status" className="text-gray-300">
 								Status
@@ -385,7 +450,7 @@ export function CreateBusDialog() {
 							</Select>
 						</div>
 
-						{/* Custom Status Input (Conditional) */}
+						{/* Custom Status */}
 						{isCustomStatus && (
 							<div className="grid gap-2 animate-in slide-in-from-top-2 duration-200">
 								<Label htmlFor="customStatus" className="text-gray-300">
@@ -394,11 +459,10 @@ export function CreateBusDialog() {
 								</Label>
 								<Input
 									id="customStatus"
-									placeholder="e.g., Waiting for driver, Boarding, etc."
+									placeholder="e.g., Waiting for driver"
 									value={customStatus}
 									onChange={(e) => setCustomStatus(e.target.value)}
 									className="border-purple-500 focus-visible:ring-purple-500 bg-gray-900 text-white"
-									autoFocus
 									required={isCustomStatus}
 								/>
 							</div>

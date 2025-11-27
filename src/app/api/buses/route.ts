@@ -62,6 +62,7 @@ export async function PUT(req: NextRequest) {
 		const {
 			origin,
 			destination,
+			specialOrigin,
 			specialDestination,
 			departureTime,
 			status,
@@ -69,7 +70,7 @@ export async function PUT(req: NextRequest) {
 			busId,
 		} = body;
 
-		if (!origin || !destination || !departureTime || !busId) {
+		if (!origin || !destination || !departureTime) {
 			return NextResponse.json(
 				{ error: "Missing required fields" },
 				{ status: 400 },
@@ -81,6 +82,7 @@ export async function PUT(req: NextRequest) {
 			.set({
 				origin,
 				destination,
+				specialOrigin: specialOrigin || null,
 				specialDestination: specialDestination || null,
 				departureTime: new Date(departureTime),
 				status: status || "On Time",
@@ -114,6 +116,7 @@ export async function POST(req: NextRequest) {
 		const {
 			origin,
 			destination,
+			specialOrigin,
 			specialDestination,
 			departureTime,
 			status,
@@ -132,6 +135,7 @@ export async function POST(req: NextRequest) {
 			.values({
 				origin,
 				destination,
+				specialOrigin: specialOrigin || null,
 				specialDestination: specialDestination || null,
 				departureTime: new Date(departureTime),
 				status: status || "On Time",

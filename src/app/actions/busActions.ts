@@ -5,12 +5,11 @@ import { bus, NewBus } from "@/db/schema/bus";
 import { auth } from "@/auth/next-auth";
 import { revalidatePath } from "next/cache";
 
-// valid locations for regular bus routes
+// Valid locations for regular bus routes (excluding "Special")
 const VALID_LOCATIONS = ["Uniworld-1", "Uniworld-2", "Macro"] as const;
 
-// raw csv row structure
+// Raw CSV row structure (Special column removed)
 type RawCsvRow = {
-	'Special': string; 
 	'Source': string;
 	'Destination': string;
 	'Departure Time': string;
@@ -18,13 +17,11 @@ type RawCsvRow = {
 	'Is Paid': string; 
 };
 
-// error details for a specific row
 export type RowValidationError = {
 	row: number; 
 	error: string; 
 };
 
-// response from the server action
 export type ScheduleResponse = {
     success: boolean;
     inserted: number;
@@ -32,107 +29,52 @@ export type ScheduleResponse = {
     message?: string;
 };
 
-
-// helper to parse our custom date format
+// Helper to parse DD-MM-YYYY HH:MM
 function parseCustomDateTime(dateTimeString: string): Date | null {
 	try {
 		const [datePart, timePart] = dateTimeString.split(" ");
-		// basic check to see if format is ok
 		if (!datePart || !timePart) return null;
 
 		const [day, month, year] = datePart.split("-").map(Number);
 		const [hours, minutes] = timePart.split(":").map(Number);
 
-		// create date object. remember month is 0 indexed
 		const date = new Date(year, month - 1, day, hours, minutes);
 
-		// check if date is valid
-		if (isNaN(date.getTime())) {
-			return null;
-		}
-		// make sure js didn't roll over the date like feb 31 to mar 3
+		// Validation check
+		if (isNaN(date.getTime())) return null;
 		if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) {
 			return null;
 		}
 
 		return date;
 	} catch (e) {
-		// return null if anything crashes
 		return null;
 	}
 }
 
-// checks one row for any issues
+// Validate individual row
 function validateRow(rowData: RawCsvRow, rowIndex: number): RowValidationError[] {
     const errors: RowValidationError[] = [];
-    // actual row number in the csv file
     const rowNumber = rowIndex + 2; 
 
-    // clean up the data
-    const isSpecial = rowData['Special']?.trim().toLowerCase() === 'true';
     const source = rowData['Source']?.trim();
     const destination = rowData['Destination']?.trim();
     const departureTimeStr = rowData['Departure Time']?.trim();
     const isPaidStr = rowData['Is Paid']?.trim().toLowerCase();
-    const status = rowData['Status']?.trim();
 
-    // check if required fields are present
-    if (!source) {
-        errors.push({ row: rowNumber, error: 'Source is required.' });
-    }
-    if (!destination) {
-        errors.push({ row: rowNumber, error: 'Destination is required.' });
-    }
-    if (!departureTimeStr) {
-        errors.push({ row: rowNumber, error: 'Departure Time is required.' });
-    }
+    // 1. Required Fields Check
+    if (!source) errors.push({ row: rowNumber, error: 'Source is required.' });
+    if (!destination) errors.push({ row: rowNumber, error: 'Destination is required.' });
+    if (!departureTimeStr) errors.push({ row: rowNumber, error: 'Departure Time is required.' });
 
-    // stop here if basics are missing
     if (errors.length > 0) return errors; 
     
-    // source and dest cant be same
+    // 2. Logic Check: Source != Destination
     if (source === destination) {
         errors.push({ row: rowNumber, error: 'Source and Destination cannot be the same.' });
     }
 
-    // check if source is a valid known location
-    const isValidSource = VALID_LOCATIONS.includes(source as any);
-
-    // VALIDATION RULES:
-    // 1. If it is NOT special, both Source and Dest must be valid locations.
-    // 2. If it IS special, we are more lenient, but if the Source is invalid, 
-    //    it will default to 'Special' in the DB. 
-    
-    if (!isSpecial) {
-        const isValidDestination = VALID_LOCATIONS.includes(destination as any);
-
-        if (!isValidSource) {
-            errors.push({ 
-                row: rowNumber, 
-                error: `Source '${source}' is invalid. Must be one of: ${VALID_LOCATIONS.join(', ')}.` 
-            });
-        }
-        if (!isValidDestination) {
-            errors.push({ 
-                row: rowNumber, 
-                error: `Destination '${destination}' is invalid. Must be one of: ${VALID_LOCATIONS.join(', ')}.` 
-            });
-        }
-    } 
-    // Optional: Uncomment this block if you want to ENFORCE that even special buses 
-    // must start from a valid campus location (Uniworld/Macro)
-    /*
-    else {
-        if (!isValidSource) {
-             errors.push({ 
-                row: rowNumber, 
-                error: `Special Bus Source '${source}' is unknown. Must start from: ${VALID_LOCATIONS.join(', ')}.` 
-            });
-        }
-    }
-    */
-
-    // check time format
+    // 3. Time Format Check
     const parsedTime = parseCustomDateTime(departureTimeStr);
     if (!parsedTime) {
         errors.push({ 
@@ -141,7 +83,7 @@ function validateRow(rowData: RawCsvRow, rowIndex: number): RowValidationError[]
         });
     }
 
-    // check is paid flag
+    // 4. Boolean Check
     if (isPaidStr && !['true', 'false', '0', '1'].includes(isPaidStr)) {
         errors.push({ 
             row: rowNumber, 
@@ -152,10 +94,8 @@ function validateRow(rowData: RawCsvRow, rowIndex: number): RowValidationError[]
     return errors;
 }
 
-
 export async function replaceSchedule(csvData: RawCsvRow[]): Promise<ScheduleResponse> {
 	try {
-		// check if user is admin
 		const session = await auth();
 		if (!session?.user?.isAdmin) {
 			return { 
@@ -166,59 +106,51 @@ export async function replaceSchedule(csvData: RawCsvRow[]): Promise<ScheduleRes
             };
 		}
 
-        // setup lists for errors and valid buses
         const validationErrors: RowValidationError[] = [];
         const validBuses: NewBus[] = [];
         
-        // handle empty file
         if (csvData.length === 0) {
             return { 
                 success: false, 
                 inserted: 0, 
                 errors: [], 
-                message: "CSV file is empty. Nothing to process." 
+                message: "CSV file is empty." 
             };
         }
 
-
-		// loop through all rows to validate
+        // Process rows
         csvData.forEach((row, i) => {
             const errors = validateRow(row, i);
             
             if (errors.length > 0) {
-                // collect errors if any
                 validationErrors.push(...errors);
             } else {
-                // otherwise format it for the db
-                const isSpecial = row['Special']?.trim().toLowerCase() === 'true';
                 const departureDate = parseCustomDateTime(row['Departure Time'].trim())!;
-                
                 const source = row['Source'].trim();
-                // check if source is one of our known campuses
-                const isSourceValidEnum = VALID_LOCATIONS.includes(source as any);
+                const destination = row['Destination'].trim();
+                
+                // Determine Origin logic
+                const isSourceStandard = VALID_LOCATIONS.includes(source as any);
+                const origin = isSourceStandard ? (source as 'Uniworld-1' | 'Uniworld-2' | 'Macro') : 'Special';
+                const specialOrigin = isSourceStandard ? null : source;
+
+                // Determine Destination logic
+                const isDestStandard = VALID_LOCATIONS.includes(destination as any);
+                const dest = isDestStandard ? (destination as 'Uniworld-1' | 'Uniworld-2' | 'Macro') : 'Special';
+                const specialDestination = isDestStandard ? null : destination;
 
                 validBuses.push({
-                    
-                    // If source is a valid campus (Uniworld-1 etc), use it.
-                    // If not (e.g. 'Airport'), default to 'Special'.
-                    origin: isSourceValidEnum ? (source as 'Uniworld-1' | 'Uniworld-2' | 'Macro') : 'Special',
-                    
-                    // Destination is 'Special' flag if it's a special route, otherwise the real location
-                    destination: isSpecial ? 'Special' : row['Destination'].trim() as 'Uniworld-1' | 'Uniworld-2' | 'Macro',
-
-                    // special dest only matters for special routes
-                    specialDestination: isSpecial ? row['Destination'].trim() : null,
-                    
+                    origin: origin,
+                    specialOrigin: specialOrigin,
+                    destination: dest,
+                    specialDestination: specialDestination,
                     departureTime: departureDate, 
                     status: row['Status']?.trim() || "On Time", 
-                    // handle the boolean conversion
                     isPaid: row['Is Paid']?.trim().toLowerCase() === "true" || row['Is Paid']?.trim() === "1", 
                 });
             }
         });
 
-
-		// if we found errors return them now
         if (validationErrors.length > 0) {
             return {
                 success: false,
@@ -228,18 +160,12 @@ export async function replaceSchedule(csvData: RawCsvRow[]): Promise<ScheduleRes
             };
         }
 
-        // data is good so we can save it
-        
-		// run database update as a transaction
+        // Database Transaction
 		await db.transaction(async (tx) => {
-			// clear old schedule
 			await tx.delete(bus);
-
-			// insert new schedule
 			await tx.insert(bus).values(validBuses);
 		});
 
-		// refresh the page data
 		revalidatePath("/");
 
 		return { 
@@ -250,8 +176,6 @@ export async function replaceSchedule(csvData: RawCsvRow[]): Promise<ScheduleRes
         };
 	} catch (error: any) {
 		console.error("Critical error replacing schedule:", error);
-		
-		// catch any other crashes
 		return { 
             success: false, 
             inserted: 0, 

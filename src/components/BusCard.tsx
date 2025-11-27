@@ -1,17 +1,17 @@
 "use client";
 
-import { ArrowRight, CheckCircle, Pencil } from "lucide-react"; // Import Pencil
+import { ArrowRight, CheckCircle, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button"; // Import Button
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Bus } from "@/db/schema/bus";
 import { cn } from "@/lib/utils";
-import { EditBusDialog } from "./EditBusDialog"; // Import the new dialog
+import { EditBusDialog } from "./EditBusDialog";
 
 interface BusCardProps {
 	bus: Bus;
 	isCompleted?: boolean;
-	isAdminView?: boolean; // Add prop to show admin controls
+	isAdminView?: boolean;
 }
 
 const getStatusStyle = (status: string) => {
@@ -46,33 +46,41 @@ const getStatusStyle = (status: string) => {
 
 export function BusCard({ bus, isCompleted, isAdminView }: BusCardProps) {
 	const departureTime = new Date(bus.departureTime);
-	const timeString = departureTime.toLocaleTimeString("en-US", {
+	
+    // Format Time: "10:30 AM"
+    const timeString = departureTime.toLocaleTimeString("en-US", {
 		hour: "2-digit",
 		minute: "2-digit",
 		hour12: true,
 	});
 
+    // Format Date: "Mon, Nov 14"
+    const dateString = departureTime.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+    });
+
 	const statusStyle = getStatusStyle(bus.status);
 
-	// Display special destination if it exists
 	const displayDestination =
 		bus.destination === "Special" && bus.specialDestination
 			? bus.specialDestination
 			: bus.destination;
 
 	const displayOrigin =
-		bus.origin === "Special" && bus.specialDestination
-			? bus.specialDestination
+		bus.origin === "Special" && bus.specialOrigin
+			? bus.specialOrigin
 			: bus.origin;
 
 	return (
 		<Card
 			className={cn(
-				"relative group overflow-hidden bg-[#1a1a1a] border-gray-300 transition-all hover:border-gray-700",
+				"relative group overflow-hidden bg-[#1a1a1a] border-gray-300 transition-all hover:border-gray-700 h-full",
 				isCompleted && "opacity-55 border-gray-700/40",
 			)}
 		>
-			{/* Admin Edit Button: Shows on hover for upcoming buses in admin view */}
+			{/* Admin Edit Button */}
 			{isAdminView && !isCompleted && (
 				<EditBusDialog bus={bus}>
 					<Button
@@ -88,8 +96,8 @@ export function BusCard({ bus, isCompleted, isAdminView }: BusCardProps) {
 				</EditBusDialog>
 			)}
 
-			<div className="px-6 space-y-6">
-				{/* Completed Badge: Show if completed. If in admin view, hide if edit button is present (i.e., not completed) */}
+			<div className="px-6 space-y-6 pb-6">
+				{/* Completed Badge */}
 				{isCompleted && (
 					<div className="absolute top-3 right-3">
 						<div className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-800/90 rounded-full border border-gray-700">
@@ -102,31 +110,39 @@ export function BusCard({ bus, isCompleted, isAdminView }: BusCardProps) {
 				)}
 
 				{/* Header: Route and Type Badge */}
-				<div className="flex items-start justify-between gap-3 pt-2">
-					<div className="flex items-center gap-3 min-w-0">
-						<span className="text-white font-medium text-xl truncate">
+				<div className="flex flex-col gap-3 pt-4">
+					<div className="flex items-center gap-3 w-full">
+						{/* Origin */}
+                        <span className="text-white font-medium text-xl wrap-break-word w-1/2 leading-tight">
 							{displayOrigin}
 						</span>
-						<ArrowRight className="h-5 w-5 text-gray-500 shrink-0" />
-						<span className="text-white font-medium text-xl truncate">
+						
+                        {/* Arrow */}
+                        <ArrowRight className="h-5 w-5 text-gray-500 shrink-0" />
+						
+                        {/* Destination */}
+                        <span className="text-white font-medium text-xl warp-break-word w-1/2 text-right leading-tight">
 							{displayDestination}
 						</span>
 					</div>
 
-					<Badge
-						variant="secondary"
-						className={cn(
-							"text-xs font-semibold px-3 py-1 shrink-0 absolute bottom-3 right-3",
-							bus.isPaid
-								? "bg-white text-black hover:bg-gray-100"
-								: "bg-white text-black hover:bg-gray-100",
-						)}
-					>
-						{bus.isPaid ? "Paid" : "Free"}
-					</Badge>
+                    {/* Paid/Free Badge */}
+                    <div className="flex justify-end">
+                        <Badge
+                            variant="secondary"
+                            className={cn(
+                                "text-xs font-semibold px-3 py-1 shrink-0",
+                                bus.isPaid
+                                    ? "bg-white text-black hover:bg-gray-100"
+                                    : "bg-white text-black hover:bg-gray-100",
+                            )}
+                        >
+                            {bus.isPaid ? "Paid" : "Free"}
+                        </Badge>
+                    </div>
 				</div>
 
-				{/* Departure Time */}
+				{/* Departure Time & Date */}
 				<div>
 					<p
 						className={cn(
@@ -136,6 +152,10 @@ export function BusCard({ bus, isCompleted, isAdminView }: BusCardProps) {
 					>
 						{timeString}
 					</p>
+                    {/* Added Date Display */}
+                    <p className="text-sm font-medium text-gray-400 mt-1 uppercase tracking-wide">
+                        {dateString}
+                    </p>
 				</div>
 
 				{/* Status */}

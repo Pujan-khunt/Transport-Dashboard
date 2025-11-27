@@ -5,14 +5,15 @@ import { useEffect, useMemo, useState } from "react";
 import { BusCard } from "@/components/BusCard";
 import BusCompletedMessage from "@/components/BusCompletedMessage";
 import CompletedBusesGrid from "@/components/CompletedBusesGrid";
+import { CreateBusDialog } from "@/components/CreateBusDialog";
 import LoadingIndicator from "@/components/LoadingIndicator";
 import NoBusMessage from "@/components/NoBusMessage";
+import OptedInUploadButton from "@/components/OptedInUploadButton";
 import UpcomingBusesGrid from "@/components/UpcomingBusesGrid";
+import CsvUploadButton from "@/components/UploadButton";
 import type { Bus } from "@/db/schema/bus";
 import type { Location } from "@/types/types";
-import { CreateBusDialog } from "@/components/CreateBusDialog";
-import CsvUploadButton from "@/components/UploadButton";
-import OptedInUploadButton from "@/components/OptedInUploadButton";
+
 const POLLING_INTERVAL_MS = 30 * 1000; // 30 seconds
 
 interface PublicDashboardClientProps {
@@ -89,7 +90,7 @@ export function PublicDashboardClient({
 		// 		new Date(a.departureTime).getTime() -
 		// 		new Date(b.departureTime).getTime(),
 		// );
-		
+
 		// Sort completed buses by departure time (most recent first)
 		// completed.sort(
 		// 	(a, b) =>
@@ -112,7 +113,7 @@ export function PublicDashboardClient({
 			{isAdmin && (
 				<div className="flex items-center justify-between p-4">
 					<CreateBusDialog />
-					<OptedInUploadButton/>
+					<OptedInUploadButton />
 					<CsvUploadButton />
 				</div>
 			)}
@@ -137,7 +138,7 @@ export function PublicDashboardClient({
 
 				{/* Display all the upcoming scheduled buses for the currently selected location*/}
 				{upcomingBuses.length > 0 && (
-					<UpcomingBusesGrid upcomingBuses={upcomingBuses} />
+					<UpcomingBusesGrid upcomingBuses={upcomingBuses} isAdmin={isAdmin} />
 				)}
 
 				{/* Display all the completed bus for the currently selected location */}

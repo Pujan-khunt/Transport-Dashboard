@@ -3,15 +3,14 @@
 import { useState } from 'react'
 import Papa from 'papaparse'
 import { useRouter } from 'next/navigation'
-// import the specific error type so we can use it in state
 import { replaceSchedule, ScheduleResponse, RowValidationError } from '@/app/actions/busActions' 
 
-const REQUIRED_CSV_COLUMNS = ['Special', 'Source', 'Destination', 'Departure Time', 'Status', 'Is Paid']
+// Updated required columns (Removed 'Special')
+const REQUIRED_CSV_COLUMNS = ['Source', 'Destination', 'Departure Time', 'Status', 'Is Paid']
 
 export default function CsvUploadButton() {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
-  // state to hold the list of errors if upload fails
   const [errorList, setErrorList] = useState<RowValidationError[] | null>(null)
   
   const router = useRouter()
@@ -20,7 +19,6 @@ export default function CsvUploadButton() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // reset states when a new file is chosen
     setIsLoading(true)
     setMessage('Parsing file...')
     setErrorList(null)
@@ -31,14 +29,13 @@ export default function CsvUploadButton() {
       complete: async (results) => {
         const data = results.data as any[]
         
-        // check if file is empty
         if (data.length === 0 || !data[0]) {
           setMessage('Error: CSV is empty.')
           setIsLoading(false)
           return
         }
         
-        // check if all columns exist
+        // Validate headers
         const fileColumns = Object.keys(data[0])
         const hasAllColumns = REQUIRED_CSV_COLUMNS.every(col => fileColumns.includes(col.trim()))
 
@@ -56,13 +53,10 @@ export default function CsvUploadButton() {
           if (response.success) {
             setMessage(`Success! ${response.inserted} buses added.`)
             router.refresh() 
-            // clear success message after a few seconds
             setTimeout(() => setMessage(''), 5000)
           } else {
-            // handle failure
             if (response.errors && response.errors.length > 0) {
                 setMessage(`Failed: ${response.errors.length} errors found.`)
-                // save the errors to state so we can show them
                 setErrorList(response.errors)
             } else {
                 setMessage(`Error: ${response.message}`)
@@ -108,7 +102,7 @@ export default function CsvUploadButton() {
         {message && <p className="text-sm text-gray-500">{message}</p>}
       </div>
 
-      {/* Error Dropdown - only shows if we have errors */}
+      {/* Error Dropdown */}
       {errorList && errorList.length > 0 && (
         <div className="absolute top-full right-0 mt-2 w-80 bg-white border border-red-200 shadow-xl rounded-lg z-50 overflow-hidden">
             <div className="bg-red-50 px-4 py-2 border-b border-red-100 flex justify-between items-center">

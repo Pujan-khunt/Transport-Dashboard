@@ -14,6 +14,7 @@ export const bus = pgTable("buses", {
 	destination: text("destination", {
 		enum: ["Uniworld-1", "Uniworld-2", "Macro", "Special"],
 	}).notNull(),
+	specialOrigin: text("special_origin"),
 	specialDestination: text("special_destination"),
 	departureTime: timestamp("departure_time", { withTimezone: true }).notNull(),
 	status: text("status").default("On Time").notNull(),
