@@ -33,7 +33,10 @@ export async function DELETE(req: NextRequest) {
 			return NextResponse.json({ error: "Missing busId" }, { status: 400 });
 		}
 
-		const [deletedBus] = await db.delete(bus).where(eq(bus.id, busId));
+		const [deletedBus] = await db
+			.delete(bus)
+			.where(eq(bus.id, busId))
+			.returning();
 		if (!deletedBus) {
 			return NextResponse.json({ message: "Bus not found" }, { status: 404 });
 		}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react"; // Import useSession
 import { useEffect, useMemo, useState } from "react";
 import { BusCard } from "@/components/BusCard";
 import BusCompletedMessage from "@/components/BusCompletedMessage";
@@ -23,11 +24,16 @@ interface PublicDashboardClientProps {
 
 export function PublicDashboardClient({
 	initialBuses,
-	isAdmin,
+	isAdmin: serverIsAdmin, // Rename prop to avoid confusion
 }: PublicDashboardClientProps) {
 	const searchParams = useSearchParams();
+	const { data: session } = useSession(); // Get client-side session
 	const selectedLocation =
 		(searchParams.get("location") as Location) || "Uniworld-1";
+
+	// Determine admin status robustly:
+	// Use server prop initially, but allow client session to keep it true if server check fails during navigation
+	const isAdmin = serverIsAdmin || session?.user?.isAdmin || false;
 
 	// Use state to hold buses, initializing with server-fetched data
 	const [buses, setBuses] = useState<Bus[]>(initialBuses);

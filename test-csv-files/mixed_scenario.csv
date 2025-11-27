@@ -1,0 +1,21 @@
+Source,Destination,Departure Time,Status,Is Paid
+Uniworld-1,Macro,28-11-2025 07:00,On Time,TRUE
+Macro,Airport,28-11-2025 07:30,On Time,TRUE
+Airport,Uniworld-2,28-11-2025 09:00,On Time,TRUE
+Macro,Uniworld-1,28-11-2025 09:15,On Time,TRUE
+Uniworld-2,Macro,28-11-2025 09:30,Delayed by 5 min,TRUE
+Railway Station,Macro,28-11-2025 10:00,On Time,TRUE
+Macro,Railway Station,28-11-2025 10:30,On Time,TRUE
+Uniworld-1,Uniworld-2,28-11-2025 11:00,On Time,FALSE
+Town Hall,Macro,28-11-2025 12:00,On Time,TRUE
+Macro,Orion Mall,28-11-2025 13:00,On Time,TRUE
+Uniworld-2,Macro,28-11-2025 14:00,On Time,TRUE
+Macro,Uniworld-2,28-11-2025 15:00,Cancelled,TRUE
+Hotel Empire,Uniworld-1,28-11-2025 16:00,On Time,FALSE
+Uniworld-1,Macro,28-11-2025 17:00,On Time,TRUE
+Macro,Airport,28-11-2025 18:00,On Time,TRUE
+Airport,Macro,28-11-2025 20:00,On Time,TRUE
+Macro,Uniworld-1,28-11-2025 21:00,On Time,TRUE
+Uniworld-2,Macro,28-11-2025 22:00,On Time,TRUE
+Macro,Special,28-11-2025 23:00,On Time,TRUE
+Special,Macro,28-11-2025 23:59,On Time,TRUE

@@ -1,0 +1,18 @@
+Source,Destination,Departure Time,Status,Is Paid
+Macro,Airport,28-11-2025 04:00,On Time,TRUE
+Uniworld-1,Railway Station,28-11-2025 05:30,On Time,TRUE
+Uniworld-2,Airport,28-11-2025 06:00,On Time,TRUE
+Macro,KSR Railway Station,28-11-2025 07:00,On Time,TRUE
+Uniworld-1,Meenakshi Mall,28-11-2025 10:00,On Time,FALSE
+Macro,Forum Mall,28-11-2025 11:30,On Time,TRUE
+Uniworld-2,Wonderla,28-11-2025 08:00,On Time,TRUE
+Macro,Bannerghatta Zoo,28-11-2025 09:00,On Time,TRUE
+Uniworld-1,Airport,28-11-2025 13:00,On Time,TRUE
+Macro,IKEA Nagasandra,28-11-2025 14:00,Delayed 15 min,TRUE
+Uniworld-2,Lulu Mall,28-11-2025 15:30,On Time,TRUE
+Macro,Cantonment Station,28-11-2025 16:00,On Time,TRUE
+Uniworld-1,Phoenix Marketcity,28-11-2025 17:00,On Time,TRUE
+Macro,Airport,28-11-2025 18:30,On Time,TRUE
+Uniworld-2,Railway Station,28-11-2025 20:00,On Time,TRUE
+Macro,Majestic Bus Stand,28-11-2025 21:15,On Time,TRUE
+Uniworld-1,Airport,28-11-2025 23:00,On Time,TRUE

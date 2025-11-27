@@ -1,0 +1,17 @@
+Source,Destination,Departure Time,Status,Is Paid
+Airport,Macro,28-11-2025 02:30,On Time,TRUE
+Railway Station,Uniworld-1,28-11-2025 05:00,On Time,TRUE
+Majestic,Macro,28-11-2025 06:45,On Time,TRUE
+Airport,Uniworld-2,28-11-2025 08:15,On Time,TRUE
+Meenakshi Mall,Macro,28-11-2025 12:30,On Time,FALSE
+Wonderla,Uniworld-2,28-11-2025 16:00,On Time,TRUE
+Forum Mall,Macro,28-11-2025 16:30,Delayed by 10 min,TRUE
+Railway Station,Uniworld-1,28-11-2025 17:00,On Time,TRUE
+Airport,Macro,28-11-2025 18:00,On Time,TRUE
+IKEA Nagasandra,Macro,28-11-2025 18:30,On Time,TRUE
+Lulu Mall,Uniworld-2,28-11-2025 19:00,On Time,TRUE
+Cantonment Station,Macro,28-11-2025 19:45,On Time,TRUE
+Phoenix Marketcity,Uniworld-1,28-11-2025 20:30,On Time,TRUE
+Airport,Uniworld-2,28-11-2025 21:30,On Time,TRUE
+Railway Station,Macro,28-11-2025 22:00,On Time,TRUE
+Airport,Macro,28-11-2025 23:50,On Time,TRUE
