@@ -12,7 +12,7 @@ import type { Bus } from "@/db/schema/bus";
 import type { Location } from "@/types/types";
 import { CreateBusDialog } from "@/components/CreateBusDialog";
 import CsvUploadButton from "@/components/UploadButton";
-
+import OptedInUploadButton from "@/components/OptedInUploadButton";
 const POLLING_INTERVAL_MS = 30 * 1000; // 30 seconds
 
 interface PublicDashboardClientProps {
@@ -112,6 +112,7 @@ export function PublicDashboardClient({
 			{isAdmin && (
 				<div className="flex items-center justify-between p-4">
 					<CreateBusDialog />
+					<OptedInUploadButton/>
 					<CsvUploadButton />
 				</div>
 			)}
