@@ -75,16 +75,41 @@ export function PublicDashboardClient({
 	// Segregate filtered buses into upcoming and completed. Also store total number of buses.
 	const { upcomingBuses, completedBuses, allCompleted } = useMemo(() => {
 		const now = new Date();
+		// Create start of today (00:00:00) to filter out previous days
+		const startOfToday = new Date(now);
+		startOfToday.setHours(0, 0, 0, 0);
+
+		// Create start of tomorrow (00:00:00 next day) to filter out future days for non-special views
+		const startOfTomorrow = new Date(startOfToday);
+		startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+
 		const upcoming: Bus[] = [];
 		const completed: Bus[] = [];
 
 		filteredBuses.forEach((bus) => {
 			const departureTime = new Date(bus.departureTime);
+
+			// Global Rule: I don't want to see the bus cards of any previous days no matter what.
+			if (departureTime < startOfToday) {
+				return;
+			}
+
 			const completedTime = new Date(departureTime.getTime());
 
 			if (completedTime > now) {
-				upcoming.push(bus);
+				// Upcoming Logic
+				if (selectedLocation === "Special") {
+					// For the special section its ok if I am seeing the bus cards which are scheduled for the future
+					upcoming.push(bus);
+				} else {
+					// For other sections, I only want to show the bus cards for today
+					if (departureTime < startOfTomorrow) {
+						upcoming.push(bus);
+					}
+				}
 			} else {
+				// Completed Logic
+				// Since we already filtered out < startOfToday, these are strictly today's completed buses
 				completed.push(bus);
 			}
 		});
@@ -108,7 +133,7 @@ export function PublicDashboardClient({
 			completedBuses: completed,
 			allCompleted: upcoming.length === 0 && filteredBuses.length > 0,
 		};
-	}, [filteredBuses]);
+	}, [filteredBuses, selectedLocation]);
 
 	return (
 		<div className="min-h-screen bg-black">
