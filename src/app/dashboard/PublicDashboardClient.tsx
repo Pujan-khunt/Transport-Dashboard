@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react"; // Import useSession
 import { useEffect, useMemo, useState } from "react";
 import { BusCard } from "@/components/BusCard";
 import BusCompletedMessage from "@/components/BusCompletedMessage";
-import CompletedBusesGrid from "@/components/CompletedBusesGrid";
 import { CreateBusDialog } from "@/components/CreateBusDialog";
 import LoadingIndicator from "@/components/LoadingIndicator";
 import NoBusMessage from "@/components/NoBusMessage";
@@ -131,9 +130,7 @@ export function PublicDashboardClient({
 						<BusCompletedMessage selectedLocation={selectedLocation} />
 
 						{/* Display all the completed buses if all existing ones are completed */}
-						{completedBuses.length > 0 && (
-							<CompletedBusesGrid completedBuses={completedBuses} />
-						)}
+
 					</div>
 				)}
 
